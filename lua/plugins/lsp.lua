@@ -173,6 +173,8 @@ return {
       capabilities = capabilities,
     }
 
+    -- OpenSCAD
+
     -- 5. Rust
     servers.rust_analyzer = {
       capabilities = capabilities,

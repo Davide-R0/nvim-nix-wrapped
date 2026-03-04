@@ -272,7 +272,8 @@
         vim-table-mode # md table formatting
         csvview-nvim # csv viewer
         actions-preview-nvim # Actions preview
-        
+        fzf-vim
+
         # Speller
         #vim-spell-it  # manual
         #vim-spell-en
@@ -310,6 +311,7 @@
 
         # Lsp
         nvim-lspconfig
+        openscad-nvim
         
         #idris2-nvim
         

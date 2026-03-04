@@ -45,18 +45,33 @@ return {
 
       -- CONFIGURAZIONE ADAPTER (I Motori AI)
       adapters = {
-        gemini = function()
-          return require("codecompanion.adapters").extend("gemini", {
+        ollama = function()
+          return require("codecompanion.adapters").extend("ollama", {
             env = {
-              api_key = get_gemini_key(),
+              url = "http://localhost:11434", -- Porta standard di Ollama
             },
             schema = {
               model = {
-                default = "gemini-1.5-flash",
+                default = "thirdeyeai/DeepSeek-R1-Distill-Qwen-7B-uncensored:Q4_0", --deepseek-r1:7b", -- O qwen2.5-coder:7b
+              },
+              num_ctx = {
+                default = 8192, -- Importante per Lean che è verboso
               },
             },
           })
         end,
+        --gemini = function()
+        --  return require("codecompanion.adapters").extend("gemini", {
+        --    env = {
+        --      api_key = get_gemini_key(),
+        --    },
+        --    schema = {
+        --      model = {
+        --        default = "gemini-1.5-flash",
+        --      },
+        --    },
+        --  })
+        --end,
         -- 1. OLLAMA (Locale)
         --ollama = function()
         --  return require("codecompanion.adapters").extend("ollama", {
@@ -114,7 +129,7 @@ return {
 
     -- MAPPATURE TASTI
     -- Ctrl+a apre il menu delle azioni AI
-    vim.keymap.set({ "n", "v" }, "<C-a>", "<cmd>CodeCompanionActions<cr>", { noremap = true, silent = true })
+    vim.keymap.set({ "n", "v" }, "<C-s>", "<cmd>CodeCompanionActions<cr>", { noremap = true, silent = true })
     -- Leader+a apre la chat laterale
     vim.keymap.set({ "n", "v" }, "<leader>a", "<cmd>CodeCompanionChat Toggle<cr>", { noremap = true, silent = true })
     -- Leader+ai aggiunge codice inline
