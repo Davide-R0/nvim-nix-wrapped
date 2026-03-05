@@ -10,7 +10,8 @@ return {
   --'conform.nvim' 
   {
     "junegunn/fzf.vim",
-    opts = {},
+    config = function()
+    end,
   };
 
   { -- OpenSCAD plugin
