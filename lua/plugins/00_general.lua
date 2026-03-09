@@ -7,18 +7,70 @@ return {
   --  end
   --},
 
-  --'conform.nvim' 
+  --'conform.nvim'
+  {
+    "stevearc/conform.nvim",
+    opts = {
+      formatters_by_ft = {
+        markdown = { "prettier", "markdownlint" },
+      },
+      formatters = {
+        prettier = {
+          prepend_args = { "--print-width", "80", "--prose-wrap", "always" },
+        },
+      },
+      format_on_save = {
+        timeout_ms = 500,
+        lsp_fallback = true,
+      },
+    },
+    -- note sulla formattazione per progetto:
+    -- avere un file .edirotconfig nella root del progetto con ad esempio:
+    --[[
+      root = true
+
+      [*]
+      end_of_line = lf
+      insert_final_newline = true
+      charset = utf-8
+      trim_trailing_whitespace = true
+      indent_style = space
+      indent_size = 2
+      max_line_length = 80
+
+      [*.md]
+      indent_size = 2
+      max_line_length = 80
+    --]]
+    -- e per il markdown specifico usare un file sempre nella root `.markdownlint.json`:
+    --[[
+      {
+        "MD004": { "style": "dash" },
+        "MD007": { "indent": 2 },
+        "MD013": {
+          "line_length": 80,
+          "code_blocks": false,
+          "tables": false,
+          "headings": false,
+          "strict": true
+        },
+        "MD001": true,
+        "MD041": false
+      }
+    --]]
+  },
+
   {
     "junegunn/fzf.vim",
     config = function()
     end,
-  };
+  },
 
   { -- OpenSCAD plugin
     "salkin-mada/openscad.nvim",
     config = function()
-        vim.g.openscad_load_snippets = true
-        require("openscad")
+      vim.g.openscad_load_snippets = true
+      require("openscad")
     end,
     dependencies = { "L3MON4D3/LuaSnip", "junegunn/fzf.vim" },
   },
@@ -65,9 +117,9 @@ return {
     cmd = { "CsvViewEnable", "CsvViewDisable", "CsvViewToggle" },
   },
 
-  { -- Md table alignment
+  {                                                 -- Md table alignment
     "dhruvasagar/vim-table-mode",
-    ft = { "markdown", "pandoc" }, -- Carica il plugin solo per i file Markdown (ottimizzazione Lazy)
+    ft = { "markdown", "pandoc" },                  -- Carica il plugin solo per i file Markdown (ottimizzazione Lazy)
     cmd = { "TableModeToggle", "TableModeEnable" }, -- Oppure caricalo quando lanci il comando
     init = function()
       -- Imposta il carattere degli angoli a '|' invece che '+'
@@ -96,7 +148,7 @@ return {
     ft = 'agda',
     --build = 'stack install',
     build = "stack build",
-    dependencies = {'neovimhaskell/nvim-hs.vim', 'kana/vim-textobj-user'},
+    dependencies = { 'neovimhaskell/nvim-hs.vim', 'kana/vim-textobj-user' },
     version = '*',
     config = function()
       -- Configurazione base
@@ -117,9 +169,9 @@ return {
     cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle", },
     ft = "markdown",
     keys = {
-      {"<leader>mp", "<cmd>MarkdownPreview <CR>", mode = {"n"}, noremap = true, desc = "markdown preview"},
-      {"<leader>ms", "<cmd>MarkdownPreviewStop <CR>", mode = {"n"}, noremap = true, desc = "markdown preview stop"},
-      {"<leader>mt", "<cmd>MarkdownPreviewToggle <CR>", mode = {"n"}, noremap = true, desc = "markdown preview toggle"},
+      { "<leader>mp", "<cmd>MarkdownPreview <CR>",       mode = { "n" }, noremap = true, desc = "markdown preview" },
+      { "<leader>ms", "<cmd>MarkdownPreviewStop <CR>",   mode = { "n" }, noremap = true, desc = "markdown preview stop" },
+      { "<leader>mt", "<cmd>MarkdownPreviewToggle <CR>", mode = { "n" }, noremap = true, desc = "markdown preview toggle" },
     },
     before = function(plugin)
       vim.g.mkdp_auto_close = 0
@@ -150,7 +202,7 @@ return {
     opts = {
       library = {
         -- Carica i tipi per l'API di Neovim (risolve il problema 'vim')
-        { path = "luvit-meta/library", words = { "vim%.uv" } },
+        { path = "luvit-meta/library",                  words = { "vim%.uv" } },
         -- adds type hints for nixCats global
         { path = (nixCats.nixCatsPath or '') .. '/lua', words = { 'nixCats' } },
       },
@@ -207,9 +259,9 @@ return {
     cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewFileHistory" },
     keys = {
       -- Apre la vista diff per tutti i file modificati
-      { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Diff View Open" },
+      { "<leader>gd", "<cmd>DiffviewOpen<cr>",          desc = "Diff View Open" },
       -- Chiude la vista diff
-      { "<leader>gc", "<cmd>DiffviewClose<cr>", desc = "Diff View Close" },
+      { "<leader>gc", "<cmd>DiffviewClose<cr>",         desc = "Diff View Close" },
       -- Mostra la storia delle modifiche del file corrente
       { "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "File History" },
     },

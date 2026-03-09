@@ -356,9 +356,11 @@ return {
     servers.asm_lsp = {
       capabilities = capabilities,
     }
-    servers.pyright = {
+
+    servers.basedpyright = {
       capabilities = capabilities,
     }
+
     servers.ts_ls = {
       capabilities = capabilities,
     }

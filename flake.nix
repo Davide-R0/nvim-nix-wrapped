@@ -139,6 +139,8 @@
       general = [
         tree-sitter
         
+        prettier # code formatter (for conform-nvim)
+
         # manual for nix options
         manix
         
@@ -163,7 +165,8 @@
         typescript-language-server
         nodePackages.bash-language-server
         # Python
-        pyright
+        basedpyright
+        #pyright # Less powerfull...?
         # Latex 
         texlab
         texlivePackages.latexindent
@@ -224,7 +227,8 @@
         # --- Lua ---
         selene                 # Linter moderno per Lua (alternativa a luacheck)
         # --- Python ---
-        python311Packages.flake8 # Il linter classico per Python
+        python3Packages.ruff
+        #python311Packages.flake8 # less powerfull linter
         # --- Nix ---
         statix                 # Linter specifico per trovare anti-pattern in Nix
         deadnix                # Trova codice Nix non utilizzato
@@ -235,9 +239,9 @@
         #ltex-ls # Linter per la lingua
 
         #vale                   # Linter per la prosa (inglese) molto potente
-        hunspell          # Motore per il controllo ortografico
-        hunspellDicts.it_IT # Dizionario italiano
-        hunspellDicts.en_US # Dizionario inglese
+        #hunspell          # Motore per il controllo ortografico
+        #hunspellDicts.it_IT # Dizionario italiano
+        #hunspellDicts.en_US # Dizionario inglese
       ];
       kickstart-debug = [
         #delve #?
@@ -273,6 +277,8 @@
         csvview-nvim # csv viewer
         actions-preview-nvim # Actions preview
         fzf-vim
+
+        conform-nvim # text formatter
 
         # Speller
         #vim-spell-it  # manual

@@ -3,7 +3,7 @@ return {
     'mfussenegger/nvim-lint',
 
     -- NOTE: nixCats: return true only if category is enabled, else false
-    enabled = true,--require('nixCatsUtils').enableForCategory("kickstart-lint")
+    enabled = true, --require('nixCatsUtils').enableForCategory("kickstart-lint")
 
     event = { 'BufReadPre', 'BufNewFile' },
 
@@ -22,13 +22,34 @@ return {
         sh = { 'shellcheck' },
         bash = { 'shellcheck' },
         lua = { 'selene' },
-        python = { 'flake8' },
+        python = { 'ruff' }, --old flake8
         nix = { 'statix', 'deadnix' },
         cpp = { 'cppcheck' },
         c = { 'cppcheck' },
         -- Per i file di testo generici
         --text = { 'vale' },  -- Normal text files
         tex = { 'chktex' }, -- For latex
+      }
+
+      local markdownlint = lint.linters.markdownlint
+      table.insert(markdownlint.args, "--config")
+      table.insert(markdownlint.args, ".markdownlint.json")
+      markdownlint.args = {
+        "--config",
+        vim.fn.json_encode({
+          MD004 = { style = "dash" }, -- Liste sempre con "-"
+          MD007 = { indent = 2 },     -- Rientro liste 2 spazi
+          MD013 = {                   -- Lunghezza linea
+            line_length = 80,
+            code_blocks = false,      -- Ignora blocchi di codice
+            tables = false,           -- Ignora tabelle
+            headings = false,         -- NON dà errore se il titolo è > 80
+            strict = true,
+          },
+          MD001 = true,  -- Controllo gerarchia titoli
+          MD041 = false, -- Permette di iniziare con ## invece di #
+        }),
+        "--",
       }
 
       -- To allow other plugins to add linters to require('lint').linters_by_ft,
