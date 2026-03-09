@@ -31,26 +31,48 @@ return {
         tex = { 'chktex' }, -- For latex
       }
 
-      local markdownlint = lint.linters.markdownlint
-      table.insert(markdownlint.args, "--config")
-      table.insert(markdownlint.args, ".markdownlint.json")
-      markdownlint.args = {
-        "--config",
-        vim.fn.json_encode({
-          MD004 = { style = "dash" }, -- Liste sempre con "-"
-          MD007 = { indent = 2 },     -- Rientro liste 2 spazi
-          MD013 = {                   -- Lunghezza linea
-            line_length = 80,
-            code_blocks = false,      -- Ignora blocchi di codice
-            tables = false,           -- Ignora tabelle
-            headings = false,         -- NON dà errore se il titolo è > 80
-            strict = true,
-          },
-          MD001 = true,  -- Controllo gerarchia titoli
-          MD041 = false, -- Permette di iniziare con ## invece di #
-        }),
-        "--",
-      }
+      --local markdownlint = lint.linters.markdownlint
+      --local config_json = [[{
+      --  "MD001": true,
+      --  "MD004": { "style": "dash" },
+      --  "MD007": { "indent": 2 },
+      --  "MD013": {
+      --    "line_length": 80,
+      --    "code_blocks": false,
+      --    "tables": false,
+      --    "headings": false,
+      --    "strict": true
+      --  },
+      --  "MD024": {
+      --    "siblings_only": true
+      --  },
+      --  "MD041": false
+      --}]]
+      --markdownlint.args = vim.list_extend({ "--config", config_json }, markdownlint.args or {})
+
+      --markdownlint.args = {
+      --  "--config",
+      --  vim.fn.json_encode({
+      --    MD004 = { style = "dash" }, -- Liste sempre con "-"
+      --    MD007 = { indent = 2 },     -- Rientro liste 2 spazi
+      --    MD013 = {                   -- Lunghezza linea
+      --      line_length = 80,
+      --      code_blocks = false,      -- Ignora blocchi di codice
+      --      tables = false,           -- Ignora tabelle
+      --      headings = false,         -- NON dà errore se il titolo è > 80
+      --      strict = true,
+      --    },
+      --    MD001 = true,  -- Controllo gerarchia titoli
+      --    MD041 = false, -- Permette di iniziare con ## invece di #
+      --  }),
+      --  "--",
+      --}
+      --vim.list_extend(markdownlint.args, {
+      --  "--disable",
+      --  "MD013", -- Disabilita l'errore sulla lunghezza della riga
+      --  "MD041", -- Disabilita l'errore "Il primo titolo deve essere H1 (#)"
+      --  "--"
+      --})
 
       -- To allow other plugins to add linters to require('lint').linters_by_ft,
       -- instead set linters_by_ft like this:
@@ -84,23 +106,23 @@ return {
       -- lint.linters_by_ft['terraform'] = nil
       -- lint.linters_by_ft['text'] = nil
 
-      -- CONFIGURAZIONE AVANZATA ARGOMENTI
-      -- Prendiamo la definizione base di selene
-      local selene = lint.linters.selene
-      -- Definiamo un percorso per una config globale (es. nella tua cache o config dir)
-      local global_selene_conf = vim.fn.stdpath("config") .. "/selene.toml"
-      -- Creiamo il file se non esiste (così non devi gestirlo manualmente)
-      if vim.fn.filereadable(global_selene_conf) == 0 then
-        local f = io.open(global_selene_conf, "w")
-        if f then
-          -- Scriviamo la config "hardcoded" nel file
-          f:write('std = "vim"\n[config]\nglobals = ["vim", "nixCats", "require"]')
-          f:close()
-        end
-      end
-      -- Diciamo a selene di usare SEMPRE questo file, ovunque tu sia
-      -- "vim.list_extend" serve per non cancellare gli argomenti di default
-      selene.args = vim.list_extend({ "--config", global_selene_conf }, selene.args)
+      ---- CONFIGURAZIONE AVANZATA ARGOMENTI
+      ---- Prendiamo la definizione base di selene
+      --local selene = lint.linters.selene
+      ---- Definiamo un percorso per una config globale (es. nella tua cache o config dir)
+      --local global_selene_conf = vim.fn.stdpath("config") .. "/selene.toml"
+      ---- Creiamo il file se non esiste (così non devi gestirlo manualmente)
+      --if vim.fn.filereadable(global_selene_conf) == 0 then
+      --  local f = io.open(global_selene_conf, "w")
+      --  if f then
+      --    -- Scriviamo la config "hardcoded" nel file
+      --    f:write('std = "vim"\n[config]\nglobals = ["vim", "nixCats", "require"]')
+      --    f:close()
+      --  end
+      --end
+      ---- Diciamo a selene di usare SEMPRE questo file, ovunque tu sia
+      ---- "vim.list_extend" serve per non cancellare gli argomenti di default
+      --selene.args = vim.list_extend({ "--config", global_selene_conf }, selene.args)
 
 
       -- Create autocommand which carries out the actual linting
