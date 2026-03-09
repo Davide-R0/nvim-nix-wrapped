@@ -1,0 +1,35 @@
+MD001: true # Enable heading +-1 levels increase
+MD003:
+  style: atx # title style with '#'
+MD004: # bullet list
+  style: dash
+MD007:
+  indent: 2
+MD010: true # No tab
+MD011: true # No (link)[text], only: [text](link)
+MD012: true # No double empty lines
+MD013:
+  line_length: 80
+  code_blocks: false
+  tables: false
+  headings: false
+  strict: true
+MD022: true # space between headings
+MD024:
+  siblings_only: true # duplicate headings in different context
+MD034: true # Link between '< >'
+MD035:
+  style: "---" # Orrizontal line only with '---'
+MD037: true # No space in coursive/bold
+MD038: true # No space in inline code
+MD039: true # No space in link
+MD041: false # No necessity for '#' in first line heading
+MD042: true # No broken link
+MD046:
+  style: fenced # Code block only with '```'
+MD048:
+  style: backtick # Inline code delimiters '`'
+MD049: # Coursive text
+  style: asterisk
+MD050: # Bold text
+  style: asterisk
