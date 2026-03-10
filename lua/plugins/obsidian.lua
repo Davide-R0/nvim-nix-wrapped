@@ -1,6 +1,8 @@
 return {
   'epwalsh/obsidian.nvim',
 
+  enabled = false,
+
   lazy = true,
 
   ft = "markdown",
@@ -8,7 +10,6 @@ return {
   dependencies = { "nvim-lua/plenary.nvim" },
 
   config = function()
-
     -- Open overrides
     vim.ui.open = (function(overridden)
       return function(uri, opt)
@@ -16,18 +17,18 @@ return {
         local is_uri = uri:match("^%a+://") -- controlla se è http:// ecc
         if is_uri then
           opt = { cmd = { "brave" } }
-        -- Gestione PDF (Zathura)
+          -- Gestione PDF (Zathura)
         elseif vim.endswith(uri, ".pdf") then
           opt = { cmd = { "zathura" } }
-        -- Gestione Immagini e Video (imv / mpv)
+          -- Gestione Immagini e Video (imv / mpv)
         elseif vim.endswith(uri, ".png") or vim.endswith(uri, ".jpg") or vim.endswith(uri, ".jpeg") or vim.endswith(uri, ".gif") then
           opt = { cmd = { "imv" } }
         elseif vim.endswith(uri, ".mp4") or vim.endswith(uri, ".mkv") then
           opt = { cmd = { "mpv" } }
-        -- Gestione Cartelle (Yazi - apre in nuovo terminale se sei su GUI, o prova ad aprire)
-        -- NOTE: Integrare yazi dentro nvim richiede plugin specifici, qui lo apriamo come app esterna
+          -- Gestione Cartelle (Yazi - apre in nuovo terminale se sei su GUI, o prova ad aprire)
+          -- NOTE: Integrare yazi dentro nvim richiede plugin specifici, qui lo apriamo come app esterna
         elseif vim.fn.isdirectory(uri) == 1 then
-           opt = { cmd = { "alacritty", "-e", "yazi" } }
+          opt = { cmd = { "alacritty", "-e", "yazi" } }
         end
 
         return overridden(uri, opt)
@@ -37,7 +38,10 @@ return {
     require('obsidian').setup({
       -- Disable legacy commands
       legacy_commands = false,
-      opts = { legacy_commands = false, };
+      opts = { legacy_commands = false, },
+
+      -- disable warning of workspaces not found
+      log_level = vim.log.levels.TRACE,
 
       -- Disable UI, use render-markdown
       ui = {
@@ -49,7 +53,7 @@ return {
           name = "Omnis",
           path = "~/00_Omnis",
           overrides = {
-            notes_subdir = "04_atomic_notes",  -- have to use 'vim.NIL' instead of 'nil'
+            notes_subdir = "04_atomic_notes", -- have to use 'vim.NIL' instead of 'nil'
             new_notes_location = "notes_subdir",
             templates = {
               folder = "04_atomic_notes/obsidian_templates",
@@ -62,10 +66,10 @@ return {
                 --  return os.date("%A")
                 --end
                 ---- TODO:
-                --date:dddd = 
-                --D = 
-                --MMMM =  
-                --YYYY = 
+                --date:dddd =
+                --D =
+                --MMMM =
+                --YYYY =
               },
             },
             daily_notes = {
@@ -96,17 +100,6 @@ return {
                 path = client:vault_relative_path(path) or path
                 return string.format("![%s](%s)", tostring(path.name), tostring(path))
               end,
-
-              -- A function that determines the text to insert in the note when pasting an image.
-              -- It takes two arguments, the `obsidian.Client` and an `obsidian.Path` to the image file.
-              -- This is the default implementation.
-              ---@param client obsidian.Client
-              ---@param path obsidian.Path the absolute path to the image file
-              ---@return string
---              img_text_func = function(client, path)
---                path = client:vault_relative_path(path) or path
---                return string.format("![%s](%s)", path.name, path)
---              end,
             },
 
             -- Optional, customize how note file names are generated given the ID, target directory, and title.
@@ -116,73 +109,33 @@ return {
               local path
               local vault_root = vim.fn.expand("~/00_Omnis/")
 
-              -- Estraiamo il titolo se esiste
-              --local title = (spec.title or ""):gsub(" ", "_"):gsub("[^A-Za-z0-9_-]", ""):lower()
-              -- spec.id adesso contiene già "titolo_pulito_con_underscore" 
-              -- perché lo abbiamo sistemato in note_id_func
               local title = tostring(spec.id)
-              --title = title:gsub(" ", "_"):gsub("[^A-Za-z0-9-]", ""):lower()
-              -- LOGICA DI SMISTAMENTO (Basata sul titolo o prefissi)
               if title:match("^atlas") then
-                -- se il titolo inizia con atlas
                 path = vault_root .. "01_atlas/" .. tostring(spec.id)
 
-              -- NOTE: for planning note use the automatic daily note creation, and fot the week and month go into the folder and create note with `.`
-              --elseif title:lower():match("^planning") then
-              --  path = vault_root .. "02_planning/" .. tostring(spec.id)
-
+                -- NOTE: for planning note use the automatic daily note creation, and fot the week and month go into the folder and create note with `.`
+                --elseif title:lower():match("^planning") then
+                --  path = vault_root .. "02_planning/" .. tostring(spec.id)
               elseif title:match("^icebox") then
                 path = vault_root .. "03_icebox/" .. tostring(spec.id)
-
               elseif title:match("^note") then
                 path = vault_root .. "04_atomic_notes/" .. tostring(spec.id)
-
-              elseif title:sub(1,1) == "." then
-                -- Nella cartella corrente
+              elseif title:sub(1, 1) == "." then
                 local current_buffer_dir = vim.fn.expand("%:p:h")
                 if current_buffer_dir:match("^oil://") then
                   current_buffer_dir = current_buffer_dir:gsub("^oil://", "")
                 end
                 path = (current_buffer_dir == "" and vim.fn.getcwd() or current_buffer_dir) .. "/" .. tostring(spec.id)
-
               else
-                -- Default: usa la subdir definita in notes_subdir ("04_atomic_notes")
                 path = tostring(spec.dir / tostring(spec.id))
               end
 
               return vim.fs.normalize(tostring(path)) .. ".md"
---
---              local path
---              -- CASO 1: "." (Current Dir / Oil)
---              if spec.title and spec.title:sub(1,1) == "." then
---                local current_buffer_dir = vim.fn.expand("%:p:h")
---                if current_buffer_dir:match("^oil://") then
---                  current_buffer_dir = current_buffer_dir:gsub("^oil://", "")
---                end
---                if current_buffer_dir == "" then current_buffer_dir = vim.fn.getcwd() end
---                path = current_buffer_dir .. "/" .. tostring(spec.id)
---
---                -- CASO 2: "/" (Sottocartella esplicita)
---              elseif spec.title and spec.title:match("/") then
---                local parent_dir = vim.fn.fnamemodify(spec.title, ":h")
---                path = vim.fn.expand("~/00_Omnis/") .. parent_dir .. "/" .. tostring(spec.id)
---
---                -- CASO 4: Default
---              else
---                path = tostring(spec.dir / tostring(spec.id))
---              end
---
---              -- Assicuriamoci che path sia una stringa prima di passarlo a normalize
---              return vim.fs.normalize(tostring(path)) .. ".md"
             end,
 
           },
         },
       },
-
-      -- Set the log level for obsidian.nvim. This is an integer corresponding to one of the log
-      -- levels defined by "vim.log.levels.*".
-      log_level = vim.log.levels.INFO,
 
       -- Completion of wiki links, local markdown links, and tags using nvim-cmp.
       completion = {
@@ -197,10 +150,6 @@ return {
       --  * "notes_subdir" - put new notes in the default notes subdirectory.
       new_notes_location = "notes_subdir",
 
-      -- Prende il titolo (es. "Il Mio Progetto").
-      -- gsub(" ", "_"): Cambia spazi in underscore -> "Il_Mio_Progetto".
-      -- lower(): Tutto minuscolo -> "il_mio_progetto".
-      -- Aggiunge timestamp -> 1737912345_il_mio_progetto. È ottimo per evitare problemi con i percorsi su Linux.
       -- Optional, customize how note IDs are generated given an optional title.
       ---@param title string|?
       ---@return string
@@ -257,7 +206,7 @@ return {
         -- Optional, alternatively you can customize the frontmatter data.
         ---@return table
         func = function(note)
-          -- 1. Se c'è un titolo (quasi sempre), aggiungilo come Alias. 
+          -- 1. Se c'è un titolo (quasi sempre), aggiungilo come Alias.
           -- FONDAMENTALE se usi ID numerici/timestamp nel nome file.
           if note.title then
             note:add_alias(note.title)
@@ -275,23 +224,9 @@ return {
         end
       },
 
-      -- NOTE: cosa è questo?
-      --  local out = { id = note.id, aliases = note.aliases, tags = note.tags }
-
-      --  -- `note.metadata` contains any manually added fields in the frontmatter.
-      --  -- So here we just make sure those fields are kept in the frontmatter.
-      --  if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
-      --    for k, v in pairs(note.metadata) do
-      --      out[k] = v
-      --    end
-      --  end
-
-      --  return out
-      --end,
-
       -- Optional, set to true to force ':ObsidianOpen' to bring the app to the foreground.
       open = {
-        -- Advanced URI è un plugin specifico di Obsidian (App). 
+        -- Advanced URI è un plugin specifico di Obsidian (App).
         -- Permette di fare cose tipo "obsidian://open?vault=Omnis&file=Nota&line=10".
         -- Se non lo hai installato dentro l'app Obsidian, lascialo false.
         -- Optional, set to true if you use the Obsidian Advanced URI plugin.
@@ -304,7 +239,6 @@ return {
         end
       },
 
-      -- NOTE: ci sono altre impostazioni da mettere qui?
       picker = {
         -- Set your preferred picker. Can be one of 'telescope.nvim', 'fzf-lua', or 'mini.pick'.
         name = "telescope.nvim",
@@ -346,8 +280,8 @@ return {
         -- Runs at the end of `require("obsidian").setup()`.
         ---@param client obsidian.Client
         post_setup = function()
-        --  -- 1 = nasconde parzialmente, 2 = nasconde tutto il markup (consigliato)
-        --  vim.opt.conceallevel = 2
+          --  -- 1 = nasconde parzialmente, 2 = nasconde tutto il markup (consigliato)
+          --  vim.opt.conceallevel = 2
           vim.api.nvim_create_autocmd("FileType", {
             pattern = "markdown",
             callback = function() vim.opt_local.conceallevel = 2 end,
@@ -381,9 +315,9 @@ return {
     -- ======================================
     -- KEYMAPPING
     -- ======================================
-    local opts = { noremap = true, silent = true }
+    --local opts = { noremap = true, silent = true }
     -- Cerca note (usa Telescope come hai impostato nel picker)
-    vim.keymap.set("n", "<leader>os", "<cmd>Obsidian search<cr>", { desc = "[O]bsidian [S]earch",  })
+    vim.keymap.set("n", "<leader>os", "<cmd>Obsidian search<cr>", { desc = "[O]bsidian [S]earch", })
     vim.keymap.set("n", "<leader>oo", "<cmd>Obsidian quick_switch<cr>", { desc = "[O]bsidian [O]pen Note" })
     vim.keymap.set("n", "<leader>on", "<cmd>Obsidian new<cr>", { desc = "[O]bsidian [N]ew Note" })
     vim.keymap.set("n", "<leader>ot", "<cmd>Obsidian template<cr>", { desc = "[O]bsidian [T]emplate" })
@@ -412,17 +346,6 @@ return {
     --vim.keymap.set("n", "<leader>otb", "<cmd>Obsidian<cr>", { desc = "Open link in new tab" }) -- Ancora non esiste
 
     -- Go to the next/previous aviable link: `[o`, `]o`
-
---    -- Alredy settes as default
---    -- Smart Action (Invio per checkbox o seguire link)
---    vim.keymap.set("n", "<cr>", function()
---      if require('obsidian').util.smart_action() then
---        return
---      else
---        -- Questo permette di mantenere il comportamento di Invio standard se non sei su un link/checkbox
---        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<cr>", true, false, true), "n", true)
---      end
---    end, { desc = "Obsidian Smart Action", noremap = false, expr = true, buffer = true })
 
     -- Visual Mode: Crea link da selezione
     vim.keymap.set("v", "<leader>ol", "<cmd>Obsidian link<cr>", { desc = "Link selection" })
@@ -464,6 +387,5 @@ return {
         end, 100)
       end
     end, { desc = "[O]bsidian [N]ew atomic [N]ote" })
-
   end,
 }
