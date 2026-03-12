@@ -36,7 +36,7 @@ vim.o.shellcmdflag = "-c"
 set.backup = false
 set.swapfile = false
 -- Undo save
-local undodir = vim.fn.stdpath("state") .. "/undo"  --~/.local/state/nvim/undo
+local undodir = vim.fn.stdpath("state") .. "/undo" --~/.local/state/nvim/undo
 if vim.fn.isdirectory(undodir) == 0 then
   vim.fn.mkdir(undodir, "p")
 end
@@ -55,7 +55,7 @@ set.number = true
 set.tabstop = 4
 set.shiftwidth = 4
 set.softtabstop = 4
-set.expandtab = true  --per avere solo spazi e non tab
+set.expandtab = true --per avere solo spazi e non tab
 
 -- Reload files changed outside nvim
 set.autoread = true
@@ -74,7 +74,7 @@ set.visualbell = true
 set.termguicolors = true
 
 --Scrolling setting
-set.scrolloff = 7 --lascia sempre un offset di righe
+set.scrolloff = 7     --lascia sempre un offset di righe
 vim.signcolumn = true --Attivazione barra sinistra per gli errori e vari (magari non necessaio)
 
 -- Setting backspace key like delite
@@ -119,12 +119,12 @@ vim.g['loaded_ruby_provider'] = 0
 
 -- Terminal
 -- TODO: Ricontrollare
-vim.cmd[[ 
+vim.cmd [[
 let term_program=$TERM_PROGRAM
 ]]
 
 -- glsl hiligting
-vim.cmd[[ 
+vim.cmd [[
 autocmd! BufNewFile,BufRead *.vs,*.fs,*.cp,*.vert,*.frag,*.comp set ft=glsl
 ]]
 
@@ -147,3 +147,80 @@ vim.api.nvim_create_autocmd("FileType", {
     end
   end,
 })
+
+local function insert_md_yaml()
+  if vim.bo.filetype ~= "markdown" then
+    vim.notify("This is not a md file!", vim.log.levels.WARN)
+    return
+  end
+
+  local first_line = vim.api.nvim_buf_get_lines(0, 0, 1, false)[1]
+
+  if first_line == "---" then
+    vim.notify("Header YAML already present.", vim.log.levels.INFO)
+  else
+    local header = {
+      "---",
+      "title: \"" .. vim.fn.expand("%:t:r") .. "\"", -- Prende il nome del file senza estensione
+      "date: " .. os.date("%Y-%m-%d"),               -- %H:%M
+      "#subtitle: \"The Document SubTitle\"",
+      "author: [Author1, Author2]",
+      "lang: it-IT",
+      "tags: []",
+      "draft: false",
+      "# ------setings------- #",
+      "geometry: \"a4paper, left=2cm, right=2cm, top=3cm, bottom=3cm\"",
+      "mainfont: \"CMU Bright\"",
+      "monofont: \"NotoSansMono\"",
+      "fontsize: 11pt",
+      "numbersections: true",
+      "toc-own-page: true",
+      "toc-depth: 4",
+      "listings-disable-line-numbers: false",
+      "listings-no-page-break: true",
+      "table-use-row-colors: true",
+      "# ------commands------- #",
+      "# \\maketitle \\tableofcontents \\newpage",
+      "# pandoc --template=\"path/to/template.tex\" -H \"path/to/preamble.tex\" --listings --pdf-engine=lualatex --resource-path=\"image/path/\" input.md -o output.pdf",
+      "---",
+      "",
+    }
+
+    vim.api.nvim_buf_set_lines(0, 0, 0, false, header)
+    vim.notify("Header YAML inserted successfully.", vim.log.levels.INFO)
+  end
+end
+vim.api.nvim_create_user_command("MdYamlHeader", insert_md_yaml, { desc = "Insert YAML header in a markdown file." })
+
+local function compile_markdown_to_pdf()
+  local input = vim.fn.expand("%:p") -- Percorso assoluto del file attuale
+  local output = vim.fn.expand("%:p:r") .. ".pdf"
+
+  if input == "" then
+    vim.notify("Error: save the document before compiling", vim.log.levels.ERROR)
+    return
+  end
+
+  -- NOTE: use absolute path
+  local config = {
+    template = vim.env.XDG_CONFIG_HOME .. "/pandoc/eisvogel.latex",
+    preamble = vim.env.XDG_CONFIG_HOME .. "/pandoc/preamble.tex",
+    --filter   = "path/to/filter.lua",
+    --res_path = "image/path/",
+  }
+
+  local cmd = string.format(
+    "pandoc --template=%s -H %s --listings --pdf-engine=lualatex  %s -o %s", -- -L %s resource-path=%s
+    vim.fn.shellescape(config.template),
+    vim.fn.shellescape(config.preamble),
+    vim.fn.shellescape(input),
+    vim.fn.shellescape(output)
+  --vim.fn.shellescape(config.filter)
+  --vim.fn.shellescape(config.res_path)
+  )
+
+  print("Compilation...")
+  vim.cmd("! " .. cmd)
+end
+
+vim.api.nvim_create_user_command("MdToPdf", compile_markdown_to_pdf, { desc = "Compile MD to PDF via Pandoc" })

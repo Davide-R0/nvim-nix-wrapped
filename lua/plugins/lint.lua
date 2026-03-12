@@ -18,7 +18,7 @@ return {
         -- BasedOnStyles = Vale
         -- # Qui potresti aggiungere stili specifici per l'italiano se ne scarichi
         -- --
-        markdown = { 'markdownlint' }, -- Also grammar checking
+        markdown = { 'markdownlint-cli2' }, -- Also grammar checking
         sh = { 'shellcheck' },
         bash = { 'shellcheck' },
         lua = { 'selene' },

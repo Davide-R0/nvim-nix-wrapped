@@ -10,9 +10,10 @@ return {
   --'conform.nvim'
   {
     "stevearc/conform.nvim",
+    -- TODO: passare a markdown-lint2: markdown = { "markdownlint-cli2" },
     opts = {
       formatters_by_ft = {
-        markdown = { "prettier", "markdownlint" },
+        markdown = { "prettier", "markdownlint-cli2" },
       },
       formatters = {
         prettier = {
@@ -20,7 +21,7 @@ return {
         },
       },
       format_on_save = {
-        timeout_ms = 500,
+        timeout_ms = 3500,
         lsp_fallback = true,
       },
     },

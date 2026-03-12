@@ -17,18 +17,19 @@ MD013:
 MD022: true # space between headings
 MD024:
   siblings_only: true # duplicate headings in different context
+MD025: false # Permette titoli multipli di livello 1
 MD034: true # Link between '< >'
 MD035:
   style: "---" # Orrizontal line only with '---'
 MD037: true # No space in coursive/bold
-MD038: true # No space in inline code
+MD038: true # No space in inline code 
 MD039: true # No space in link
 MD041: false # No necessity for '#' in first line heading
 MD042: true # No broken link
-MD046:
-  style: fenced # Code block only with '```'
-MD048:
-  style: backtick # Inline code delimiters '`'
+MD046: # Code block only with '```'
+  style: fenced 
+MD048: # Inline code delimiters '`'
+  style: backtick 
 MD049: # Coursive text
   style: asterisk
 MD050: # Bold text
