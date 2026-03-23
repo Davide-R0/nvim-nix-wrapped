@@ -7,24 +7,55 @@ return {
   --  end
   --},
 
+  -- Typst preview
+  {
+    'chomosuke/typst-preview.nvim',
+    --lazy = false, -- or
+    ft = 'typst',
+    version = '1.*',
+    opts = {},
+  },
+
+
   --'conform.nvim'
   {
     "stevearc/conform.nvim",
     -- TODO: passare a markdown-lint2: markdown = { "markdownlint-cli2" },
+
+    opts = function()
+      -- Leggi il valore da Nix. Se non esiste, usa 80 come fallback.
+      local md_line_length = nixCats('settings.categories.markdown-line-length') or 80 -- NON FUNZIONA!!
+
+      return {
+        formatters_by_ft = {
+          markdown = { "prettier", "markdownlint-cli2" },
+        },
+        formatters = {
+          prettier = {
+            prepend_args = { "--print-width", tostring(md_line_length), "--prose-wrap", "always" },
+          },
+        },
+        format_on_save = {
+          timeout_ms = 3500,
+          lsp_fallback = true,
+        },
+      }
+    end,
+    --[[
     opts = {
       formatters_by_ft = {
         markdown = { "prettier", "markdownlint-cli2" },
       },
       formatters = {
         prettier = {
-          prepend_args = { "--print-width", "80", "--prose-wrap", "always" },
+          prepend_args = { "--print-width", tostring(md_line_length), "--prose-wrap", "always" },
         },
       },
       format_on_save = {
         timeout_ms = 3500,
         lsp_fallback = true,
       },
-    },
+    },]] --
     -- note sulla formattazione per progetto:
     -- avere un file .edirotconfig nella root del progetto con ad esempio:
     --[[

@@ -74,8 +74,8 @@ set.visualbell = true
 set.termguicolors = true
 
 --Scrolling setting
-set.scrolloff = 7     --lascia sempre un offset di righe
-vim.signcolumn = true --Attivazione barra sinistra per gli errori e vari (magari non necessaio)
+set.scrolloff = 10         --lascia sempre un offset di righe
+vim.opt.signcolumn = "yes" --Attivazione barra sinistra per gli errori e vari (magari non necessaio)
 
 -- Setting backspace key like delite
 --set.backspace = "indent", "eol", "start"
@@ -164,7 +164,7 @@ local function insert_md_yaml()
       "title: \"" .. vim.fn.expand("%:t:r") .. "\"", -- Prende il nome del file senza estensione
       "date: " .. os.date("%Y-%m-%d"),               -- %H:%M
       "#subtitle: \"The Document SubTitle\"",
-      "author: [Author1, Author2]",
+      "author: []",
       "lang: it-IT",
       "tags: []",
       "draft: false",
@@ -174,13 +174,12 @@ local function insert_md_yaml()
       "monofont: \"NotoSansMono\"",
       "fontsize: 11pt",
       "numbersections: true",
-      "toc-own-page: true",
       "toc-depth: 4",
       "listings-disable-line-numbers: false",
       "listings-no-page-break: true",
       "table-use-row-colors: true",
       "# ------commands------- #",
-      "# \\maketitle \\tableofcontents \\newpage",
+      "# \\maketitle \\newpage \\tableofcontents \\newpage",
       "# pandoc --template=\"path/to/template.tex\" -H \"path/to/preamble.tex\" --listings --pdf-engine=lualatex --resource-path=\"image/path/\" input.md -o output.pdf",
       "---",
       "",
@@ -210,7 +209,7 @@ local function compile_markdown_to_pdf()
   }
 
   local cmd = string.format(
-    "pandoc --template=%s -H %s --listings --pdf-engine=lualatex  %s -o %s", -- -L %s resource-path=%s
+    "pandoc --template=%s -H %s --pdf-engine=lualatex  %s -o %s", -- --listings  -L %s resource-path=%s
     vim.fn.shellescape(config.template),
     vim.fn.shellescape(config.preamble),
     vim.fn.shellescape(input),

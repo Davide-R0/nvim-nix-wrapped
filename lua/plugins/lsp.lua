@@ -45,7 +45,7 @@ return {
   config = function()
     vim.diagnostic.config({
       signs = {
-        text = { 
+        text = {
           [vim.diagnostic.severity.ERROR] = " ",
           [vim.diagnostic.severity.WARN] = " ",
           [vim.diagnostic.severity.HINT] = "󰠠 ",
@@ -83,7 +83,7 @@ return {
         map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
         map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
         map('<leader>e', vim.diagnostic.open_float, 'Show diagnostic [E]rror') -- error
-        --map('gl', vim.diagnostic.open_float, 'Show diagnostic line')  
+        --map('gl', vim.diagnostic.open_float, 'Show diagnostic line')
         map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
         map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
         map('K', vim.lsp.buf.hover, 'Hover Documentation')
@@ -150,7 +150,7 @@ return {
     -- HTML (Configurazione Speciale)
     -- Creiamo capability specifica per snippet html
     local html_capabilities = vim.tbl_deep_extend('force', capabilities, {
-       textDocument = { completion = { completionItem = { snippetSupport = true } } }
+      textDocument = { completion = { completionItem = { snippetSupport = true } } }
     })
     servers.html = {
       capabilities = html_capabilities,
@@ -180,11 +180,11 @@ return {
       capabilities = capabilities,
       settings = {
         ['rust-analyzer'] = {
-           cargo = {
-             -- SU NIXOS: Generalmente meglio non hardcodare il path se usi nix shell o devShells.
-           }
-         }
-       }
+          cargo = {
+            -- SU NIXOS: Generalmente meglio non hardcodare il path se usi nix shell o devShells.
+          }
+        }
+      }
     }
 
     -- 6. TexLab (LaTeX)
@@ -209,47 +209,63 @@ return {
       }
     }
 
+    --[[
+    LspTinymistExportSvg, LspTinymistExportPng, LspTinymistExportPdf, LspTinymistExportMarkdown, LspTinymistExportText, LspTinymistExportQuery, LspTinymistExportAnsiHighlight, LspTinymistGetServerInfo, LspTinymistGetDocumentTrace, LspTinymistGetWorkspaceLabels, LspTinymistGetDocumentMetrics, and LspTinymistPinMain.
+    --]]
+    -- Typst
+    servers.tinymist = {
+      capabilities = capabilities,
+      cmd = { "tinymist" },
+      settings = {
+        exportPdf = "onSave", -- Opzioni: "never", "onSave", "onType"
+        -- Opzionale: se vuoi usare il formatter integrato
+        formatterMode = "typstyle",
+        -- Opzionale: disabilita l'export HTML se non ti serve per risparmiare risorse
+        exportHtml = "never",
+      }
+    };
 
 
---    -- 2. LTeX per la grammatica
---    servers.ltex = {
---      capabilities = capabilities,
---      -- Aggiungi questo flag per dire a lspconfig che ltex-ls supporta i file gitcommit e markdown
---      filetypes = { "markdown", "tex", "bib", "latex", "text", "gitcommit" },
---
---      on_attach = function(client, bufnr)
---        -- 2. Caricamento PROTETTO di ltex_extra
---        -- Se Nix non lo ha caricato, 'ok' sarà false e non crasherà tutto
---        local ok, ltex_extra = pcall(require, "ltex_extra")
---
---        if ok then
---          ltex_extra.setup {
---            load_langs = { "it-IT", "en-US" },
---            init_check = true,
---            -- 3. Passiamo la stringa, NON la funzione
---            path = dict_path,
---            log_level = "trace",
---            server_opts = nil -- Corretto, lasciamo che lspconfig gestisca il server
---          }
---        else
---          vim.notify("ltex_extra non trovato! Verifica il flake.nix", vim.log.levels.WARN)
---        end
---      end,
---      settings = {
---        ltex = {
---          language = "it-IT",
---          --language = "auto",
---          --diagnosticSeverity = "information",
---          additionalRules = {
---            enablePickyRules = true,
---            motherTongue = "it",
---          },
---          disabledRules = {
---            --it = { "APOS_TYP", "FRENCH_WHITESPACE" } 
---          },
---        }
---      }
---    }
+
+    --    -- 2. LTeX per la grammatica
+    --    servers.ltex = {
+    --      capabilities = capabilities,
+    --      -- Aggiungi questo flag per dire a lspconfig che ltex-ls supporta i file gitcommit e markdown
+    --      filetypes = { "markdown", "tex", "bib", "latex", "text", "gitcommit" },
+    --
+    --      on_attach = function(client, bufnr)
+    --        -- 2. Caricamento PROTETTO di ltex_extra
+    --        -- Se Nix non lo ha caricato, 'ok' sarà false e non crasherà tutto
+    --        local ok, ltex_extra = pcall(require, "ltex_extra")
+    --
+    --        if ok then
+    --          ltex_extra.setup {
+    --            load_langs = { "it-IT", "en-US" },
+    --            init_check = true,
+    --            -- 3. Passiamo la stringa, NON la funzione
+    --            path = dict_path,
+    --            log_level = "trace",
+    --            server_opts = nil -- Corretto, lasciamo che lspconfig gestisca il server
+    --          }
+    --        else
+    --          vim.notify("ltex_extra non trovato! Verifica il flake.nix", vim.log.levels.WARN)
+    --        end
+    --      end,
+    --      settings = {
+    --        ltex = {
+    --          language = "it-IT",
+    --          --language = "auto",
+    --          --diagnosticSeverity = "information",
+    --          additionalRules = {
+    --            enablePickyRules = true,
+    --            motherTongue = "it",
+    --          },
+    --          disabledRules = {
+    --            --it = { "APOS_TYP", "FRENCH_WHITESPACE" }
+    --          },
+    --        }
+    --      }
+    --    }
 
     local harper_dict = vim.fn.stdpath("config") .. "/dict/harper_user.txt"
     local dict_dir = vim.fn.stdpath("config") .. "/dict"
@@ -304,12 +320,12 @@ return {
     -- Markdown oxide
     servers.markdown_oxide = {
       capabilities = vim.tbl_deep_extend('force', capabilities, {
-          workspace = {
-            didChangeWatchedFiles = {
-              dynamicRegistration = true,
-            },
-          }
+        workspace = {
+          didChangeWatchedFiles = {
+            dynamicRegistration = true,
+          },
         }
+      }
       ),
     }
 
@@ -347,7 +363,7 @@ return {
       capabilities = capabilities,
     }
 
-    -- OpenSCAD 
+    -- OpenSCAD
     servers.openscad_lsp = {
       capabilities = capabilities,
     }

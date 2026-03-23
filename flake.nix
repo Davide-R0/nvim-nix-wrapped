@@ -211,6 +211,10 @@
               git
               lazygit
 
+              # For typst
+              typst
+              tinymist # typst lsp
+
               # Lean # NOTE: After the first installation: `elan default stable`
               elan
 
@@ -302,6 +306,9 @@
               fzf-vim
 
               conform-nvim # text formatter
+
+              # Typst preview
+              typst-preview-nvim
 
               # Speller
               #vim-spell-it  # manual
@@ -488,6 +495,9 @@
               #    "see :help nixCats"
               #  ];
               #};
+
+              markdown-line-length = 70; # Default a 80 caratteri
+              enable-obsidian-plugin = false;
             };
           };
       };

@@ -1,7 +1,7 @@
 return {
   'epwalsh/obsidian.nvim',
 
-  enabled = false,
+  enabled = nixCats('options.enable-obsidian-plugin') == false,
 
   lazy = true,
 
