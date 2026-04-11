@@ -1,6 +1,8 @@
 -- Per le funzioni set...=... in .vim
 local set = vim.opt
 
+-- per norg
+set.conceallevel = 2
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 --vim.opt.mouse = 'a'

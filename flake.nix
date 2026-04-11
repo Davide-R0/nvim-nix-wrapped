@@ -186,7 +186,7 @@
               # Web (HTML/CSS/JS/TS)
               vscode-langservers-extracted # Fornisce html, css, json
               typescript-language-server
-              nodePackages.bash-language-server
+              bash-language-server
               # Python
               basedpyright
               #pyright # Less powerfull...?
@@ -202,6 +202,9 @@
               asm-lsp
               # toml files
               taplo
+              # Asm
+              asm-lsp
+              asmfmt
 
               # For telescope
               ripgrep
@@ -309,6 +312,12 @@
 
               # Typst preview
               typst-preview-nvim
+
+              # neorg
+              neorg
+              neorg-telescope
+
+              calendar-vim
 
               # Speller
               #vim-spell-it  # manual

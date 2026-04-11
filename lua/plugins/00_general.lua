@@ -16,6 +16,70 @@ return {
     opts = {},
   },
 
+  {
+    "itchyny/calendar.vim",
+    config = function()
+      -- Configurazione opzionale: inizia la settimana di lunedì
+      vim.g.calendar_monday = 1
+    end
+  },
+
+  {
+    "nvim-neorg/neorg",
+    lazy = false,  -- Disable lazy loading as some `lazy.nvim` distributions set `lazy = true` by default
+    version = "*", -- Pin Neorg to the latest stable release
+
+    dependencies = {
+      { "nvim-lua/plenary.nvim" },
+      { "nvim-neorg/neorg-telescope" },
+    },
+
+    opts = {
+      load = {
+        ["core.defaults"] = {},      -- Carica tutte le funzionalità base vitali
+
+        ["core.esupports.hop"] = {}, -- Abilita il salto tra i link
+
+        ["core.concealer"] = {
+          config = {
+            -- Questo modulo è quello che trasforma i caratteri grezzi in bellissime icone
+            icon_preset = "varied",
+          },
+        },
+
+        --        ["core.integrations.calendar"] = {},
+
+        ["core.dirman"] = { -- Il "Directory Manager": gestisce i tuoi workspace
+          config = {
+            workspaces = {
+              -- Puoi mettere i percorsi che preferisci
+              --lavoro = "~/note_lavoro",
+              personale = "~/Norg",
+              --progetti = "~/Documenti/progetti_norg",
+            },
+            -- Opzionale: quale workspace aprire di default
+            default_workspace = "personale",
+          },
+        },
+
+        ["core.integrations.nvim-cmp"] = {},
+
+        ["core.integrations.telescope"] = {},
+
+        ["core.journal"] = {
+          config = {
+            workspace = "personale", -- In quale workspace mettere le note del giorno
+          },
+        },
+
+        ["core.tangle"] = {
+          config = { tangle_on_write = true }
+        },
+
+      },
+    },
+  },
+
 
   --'conform.nvim'
   {

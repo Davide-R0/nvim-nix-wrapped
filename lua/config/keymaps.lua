@@ -10,7 +10,7 @@ vim.keymap.set('n', '<leader>ow', ':ObsidianWorkspace<CR>', { desc = "Show all w
 vim.keymap.set('n', '<leader>os', ':ObsidianSearch<CR>', { desc = "Grep in all the vault" })
 vim.keymap.set('n', '<leader>ol', ':ObsidianLinks<CR>', { desc = "Show links in the file" })
 vim.keymap.set('n', '<leader>ot', ':ObsidianTags<CR>', { desc = "Show the tags created" })
--- 'gf' follow the link 
+-- 'gf' follow the link
 -- 'Invio' follow link and/or check checkbokes
 
 -- prnter setup
@@ -19,8 +19,8 @@ vim.keymap.set('n', '<leader>ot', ':ObsidianTags<CR>', { desc = "Show the tags c
 --vim.cmd[[nnoremap <leader><leader><leader>ph :w<cr>:!lpoptions -d Smart_Tank_7000<cr>:!lp -n 1 -o media=a4 -o sides=two-sided-long-edge -o page-top=72 -o page-bottom=72 -o page-left=72 -o page-right=72 %<cr><cr>]]
 
 -- For spelling checking
-vim.cmd[[nnoremap <leader>it :setlocal spell spelllang=it <cr>]]
-vim.cmd[[nnoremap <leader>en :setlocal spell spelllang=en <cr>]]
+vim.cmd [[nnoremap <leader>it :setlocal spell spelllang=it <cr>]]
+vim.cmd [[nnoremap <leader>en :setlocal spell spelllang=en <cr>]]
 
 -- ===============================================
 -- Digrafi Personalizzati
@@ -30,14 +30,16 @@ vim.cmd[[nnoremap <leader>en :setlocal spell spelllang=en <cr>]]
 vim.cmd('digraph RR 8477')
 -- Il numero 8469 è il codice decimale per ℕ (hex 2115).
 vim.cmd('digraph NN 8469')
-vim.cmd('digraph ZZ 8484')  -- ℤ (Numeri Interi)
-vim.cmd('digraph CC 8450')  -- ℂ (Numeri Complessi)
+vim.cmd('digraph ZZ 8484') -- ℤ (Numeri Interi)
+vim.cmd('digraph CC 8450') -- ℂ (Numeri Complessi)
 
 -- Spectre
 vim.keymap.set('n', '<leader>S', '<cmd>lua require("spectre").toggle()<CR>', { desc = "Toggle Spectre" })
-vim.keymap.set('n', '<leader>sw', '<cmd>lua require("spectre").open_visual({select_word=true})<CR>', { desc = "Search current word" })
+vim.keymap.set('n', '<leader>sw', '<cmd>lua require("spectre").open_visual({select_word=true})<CR>',
+  { desc = "Search current word" })
 vim.keymap.set('v', '<leader>sw', '<esc><cmd>lua require("spectre").open_visual()<CR>', { desc = "Search current word" })
-vim.keymap.set('n', '<leader>sp', '<cmd>lua require("spectre").open_file_search({select_word=true})<CR>', { desc = "Search on current file" })
+vim.keymap.set('n', '<leader>sp', '<cmd>lua require("spectre").open_file_search({select_word=true})<CR>',
+  { desc = "Search on current file" })
 
 -- PRINT
 vim.api.nvim_create_user_command(
@@ -135,3 +137,14 @@ vim.api.nvim_create_user_command(
     desc = 'Converte il MD in PDF in modo robusto e lo stampa.'
   }
 )
+
+
+-- NORG mode
+-- Mappatura specifica per i file Neorg
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "norg",
+  callback = function()
+    -- Remap di gd per simulare la pressione di Invio (che Neorg usa per i link)
+    vim.keymap.set("n", "gd", "<CR>", { buffer = true, remap = true })
+  end,
+})
