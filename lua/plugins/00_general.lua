@@ -88,7 +88,7 @@ return {
 
     opts = function()
       -- Leggi il valore da Nix. Se non esiste, usa 80 come fallback.
-      local md_line_length = nixCats('settings.categories.markdown-line-length') or 80 -- NON FUNZIONA!!
+      local md_line_length = nixCats('settings.categories.markdown-line-length') or 64 -- NON FUNZIONA!!
 
       return {
         formatters_by_ft = {
