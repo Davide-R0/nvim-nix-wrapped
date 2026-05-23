@@ -2,6 +2,10 @@
 vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle)
 --vim.keymap.set('n', '<leader>u', require('undotree').toggle, { noremap = true, silent = true })
 
+-- Scorciatoie aggiuntive per inizio e fine riga (i tasti 0 e $ rimangono attivi)
+vim.keymap.set({ 'n', 'v' }, 'H', '0', { desc = "Vai a inizio riga assoluto" })
+vim.keymap.set({ 'n', 'v' }, 'L', '$', { desc = "Vai a fine riga" })
+
 -- gen AI
 --vim.keymap.set({ 'n', 'v' }, '<leader>]', ':Gen<CR>')
 
