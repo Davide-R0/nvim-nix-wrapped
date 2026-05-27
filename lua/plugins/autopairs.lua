@@ -1,15 +1,19 @@
 return {
-  'windwp/nvim-autopairs',
-  -- NOTE: nixCats: return true only if category is enabled, else false
-  enabled = true, --require('nixCatsUtils').enableForCategory("kickstart-lint")
-  event = 'InsertEnter',
-  -- Optional dependency
-  dependencies = { 'hrsh7th/nvim-cmp' },
-  config = function()
-    require('nvim-autopairs').setup {}
-    -- If you want to automatically add `(` after selecting a function or method
-    local cmp_autopairs = require 'nvim-autopairs.completion.cmp'
-    local cmp = require 'cmp'
-    cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
-  end,
+  {
+    "nvim-autopairs",
+    auto_enable = true,
+    enabled = true,
+    event = 'InsertEnter',
+    after = function()
+      require('nvim-autopairs').setup {}
+      local cmp_autopairs = require 'nvim-autopairs.completion.cmp'
+      local cmp = require 'cmp'
+      cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
+    end,
+  },
+  {
+    "nvim-cmp",
+    auto_enable = true,
+    dep_of = { "nvim-autopairs" },
+  }
 }
