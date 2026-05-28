@@ -1,6 +1,9 @@
 -- Per le funzioni set...=... in .vim
 local set = vim.opt
 
+vim.g.mapleader = '\\'
+vim.g.maplocalleader = '\\'
+
 -- per norg
 set.conceallevel = 2
 
@@ -38,11 +41,11 @@ vim.o.shellcmdflag = "-c"
 set.backup = false
 set.swapfile = false
 -- Undo save
-local undodir = vim.fn.stdpath("state") .. "/undo" --~/.local/state/nvim/undo
-if vim.fn.isdirectory(undodir) == 0 then
-  vim.fn.mkdir(undodir, "p")
-end
-set.undodir = undodir
+--local undodir = vim.fn.stdpath("state") .. "/undo" --~/.local/state/nvim/undo
+--if vim.fn.isdirectory(undodir) == 0 then
+--  vim.fn.mkdir(undodir, "p")
+--end
+--set.undodir = undodir
 set.undofile = true
 
 -- for obsidian preview
@@ -62,8 +65,8 @@ set.expandtab = true --per avere solo spazi e non tab
 -- Reload files changed outside nvim
 set.autoread = true
 
---Set Encoding
-set.encoding = "utf-8"
+--Set Encoding -- dovrebeb averlo di default
+--set.encoding = "utf-8"
 
 -- Search hilighting
 set.hlsearch = false
@@ -129,99 +132,3 @@ let term_program=$TERM_PROGRAM
 vim.cmd [[
 autocmd! BufNewFile,BufRead *.vs,*.fs,*.cp,*.vert,*.frag,*.comp set ft=glsl
 ]]
-
--- Tab space for some files
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "nix", "lua", "json", "jsonc", "yaml", "html", "css", "scss", "javascript", "typescript", "javascriptreact", "typescriptreact", "ruby" },
-  callback = function(args)
-    vim.opt_local.tabstop = 2
-    vim.opt_local.shiftwidth = 2
-    vim.opt_local.softtabstop = 2
-    vim.opt_local.expandtab = true
-    -- Fix specifico per Nix (e altri linguaggi che usano # per i commenti)
-    if args.match == "nix" or args.match == "ruby" or args.match == "python" then
-      -- Disabilita smartindent (è spesso lui che spara il # a inizio riga)
-      vim.opt_local.smartindent = false
-      -- Rimuove la regola 0# da indentkeys (se presente)
-      vim.opt_local.indentkeys:remove("0#")
-      -- Rimuove la regola 0# da cinkeys (spesso usata come fallback)
-      vim.opt_local.cinkeys:remove("0#")
-    end
-  end,
-})
-
-local function insert_md_yaml()
-  if vim.bo.filetype ~= "markdown" then
-    vim.notify("This is not a md file!", vim.log.levels.WARN)
-    return
-  end
-
-  local first_line = vim.api.nvim_buf_get_lines(0, 0, 1, false)[1]
-
-  if first_line == "---" then
-    vim.notify("Header YAML already present.", vim.log.levels.INFO)
-  else
-    local header = {
-      "---",
-      "title: \"" .. vim.fn.expand("%:t:r") .. "\"", -- Prende il nome del file senza estensione
-      "date: " .. os.date("%Y-%m-%d"),               -- %H:%M
-      "#subtitle: \"The Document SubTitle\"",
-      "author: []",
-      "lang: it-IT",
-      "tags: []",
-      "draft: false",
-      "# ------setings------- #",
-      "geometry: \"a4paper, left=2cm, right=2cm, top=3cm, bottom=3cm\"",
-      "mainfont: \"CMU Bright\"",
-      "monofont: \"NotoSansMono\"",
-      "fontsize: 11pt",
-      "numbersections: true",
-      "toc-depth: 4",
-      "listings-disable-line-numbers: false",
-      "listings-no-page-break: true",
-      "table-use-row-colors: true",
-      "# ------commands------- #",
-      "# \\maketitle \\newpage \\tableofcontents \\newpage",
-      "# pandoc --template=\"path/to/template.tex\" -H \"path/to/preamble.tex\" --listings --pdf-engine=lualatex --resource-path=\"image/path/\" input.md -o output.pdf",
-      "---",
-      "",
-    }
-
-    vim.api.nvim_buf_set_lines(0, 0, 0, false, header)
-    vim.notify("Header YAML inserted successfully.", vim.log.levels.INFO)
-  end
-end
-vim.api.nvim_create_user_command("MdYamlHeader", insert_md_yaml, { desc = "Insert YAML header in a markdown file." })
-
-local function compile_markdown_to_pdf()
-  local input = vim.fn.expand("%:p") -- Percorso assoluto del file attuale
-  local output = vim.fn.expand("%:p:r") .. ".pdf"
-
-  if input == "" then
-    vim.notify("Error: save the document before compiling", vim.log.levels.ERROR)
-    return
-  end
-
-  -- NOTE: use absolute path
-  local config = {
-    template = vim.env.XDG_CONFIG_HOME .. "/pandoc/eisvogel.latex",
-    preamble = vim.env.XDG_CONFIG_HOME .. "/pandoc/preamble.tex",
-    --filter   = "path/to/filter.lua",
-    --res_path = "image/path/",
-  }
-
-  local cmd = string.format(
-    "pandoc --template=%s -H %s --pdf-engine=lualatex  %s -o %s", -- --listings  -L %s resource-path=%s
-    vim.fn.shellescape(config.template),
-    vim.fn.shellescape(config.preamble),
-    vim.fn.shellescape(input),
-    vim.fn.shellescape(output)
-  --vim.fn.shellescape(config.filter)
-  --vim.fn.shellescape(config.res_path)
-  )
-
-  print("Compilation...")
-  vim.cmd("! " .. cmd)
-end
-
-vim.api.nvim_create_user_command("MdToPdf", compile_markdown_to_pdf, { desc = "Compile MD to PDF via Pandoc" })

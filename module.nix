@@ -58,16 +58,66 @@ inputs:
   #    }
   #  );
   #};
-  # If you don't want the boilerplate of a whole option in settings, you could just pass stuff
-  config.info.testvalue = {
-    some = "stuff";
-    goes = "here";
+  # # If you don't want the boilerplate of a whole option in settings, you could just pass stuff
+  # config.info.testvalue = {
+  #   some = "stuff";
+  #   goes = "here";
+  # };
+  # # and grab it in lua with `require(vim.g.nix_info_plugin_name)(nil, "info", "testvalue", "some") == "stuff"`
+  # # Tip: in your nvim command line run:
+  # # `:lua require('lzextras').debug.display(require(vim.g.nix_info_plugin_name))`
+  # config.settings.anothertestvalue = {
+  #   settings = "can also accept freeform values";
+  # };
+
+  # ==========
+  # Configs
+  # ==========
+  options.settings.neorg.enable = lib.mkEnableOption "Enable Neorg plugin";
+  config.settings.neorg.enable = lib.mkDefault true;
+
+  options.settings.ai.enable = lib.mkEnableOption "Enable AI plugin (CodeCompanion)";
+  config.settings.ai.enable = lib.mkDefault true;
+
+  options.settings.obsidian.enable = lib.mkEnableOption "Enable Obsidian plugin";
+  config.settings.obsidian.enable = lib.mkDefault true;
+
+  options.settings.conform.md_line_length = lib.mkOption {
+    type = lib.types.int;
+    default = 80;
+    description = "Max line length for markdown formatting";
   };
-  # and grab it in lua with `require(vim.g.nix_info_plugin_name)(nil, "info", "testvalue", "some") == "stuff"`
-  # Tip: in your nvim command line run:
-  # `:lua require('lzextras').debug.display(require(vim.g.nix_info_plugin_name))`
-  config.settings.anothertestvalue = {
-    settings = "can also accept freeform values";
+
+  config.specs.neorg = {
+    enable = config.settings.neorg.enable;
+    lazy = true;
+    data = with pkgs.vimPlugins; [
+      neorg
+      neorg-telescope
+    ];
+  };
+
+  config.specs.ai = {
+    enable = config.settings.ai.enable;
+    lazy = true;
+    data = with pkgs.vimPlugins; [
+      codecompanion-nvim
+    ];
+  };
+
+  config.specs.obsidian = {
+    enable = config.settings.obsidian.enable;
+    lazy = true;
+    data = with pkgs.vimPlugins; [
+      obsidian-nvim
+    ];
+  };
+
+  # TODO: cambairlo e metterlo nei plugin generali??
+  config.specs.lsp = {
+    data = with pkgs.vimPlugins; [
+      nvim-lspconfig
+    ];
   };
 
   # If the defaults are fine, you can just provide the `.data` field
@@ -95,26 +145,26 @@ inputs:
     }
   ];
 
-  # you can name these whatever you want.
-  config.specs.nix = {
-    data = null;
-    runtimePkgs = with pkgs; [
-      nixd
-      nixfmt
-    ];
-  };
-  # You can use the before and after fields to run them before or after other specs or spec of lists of specs
-  config.specs.lua = {
-    after = [ "general" ];
-    lazy = true;
-    data = with pkgs.vimPlugins; [
-      lazydev-nvim
-    ];
-    runtimePkgs = with pkgs; [
-      lua-language-server
-      stylua
-    ];
-  };
+  # # you can name these whatever you want.
+  # config.specs.nix = {
+  #   data = null;
+  #   runtimePkgs = with pkgs; [
+  #     nixd
+  #     nixfmt
+  #   ];
+  # };
+  # # You can use the before and after fields to run them before or after other specs or spec of lists of specs
+  # config.specs.lua = {
+  #   after = [ "general" ];
+  #   lazy = true;
+  #   data = with pkgs.vimPlugins; [
+  #     lazydev-nvim
+  #   ];
+  #   runtimePkgs = with pkgs; [
+  #     lua-language-server
+  #     stylua
+  #   ];
+  # };
 
   config.specs.general = {
     # this would ensure any config included from nix in here will be ran after any provided by the `lze` spec
@@ -141,7 +191,9 @@ inputs:
       # ====================
       # Lua & Nix
       lua-language-server
+      stylua
       nixd
+      nixfmt
       # C / C++
       clang-tools
       cmake-language-server
@@ -285,10 +337,6 @@ inputs:
       # Typst preview
       typst-preview-nvim
 
-      # neorg
-      neorg
-      neorg-telescope
-
       calendar-vim
 
       # Speller
@@ -297,9 +345,6 @@ inputs:
 
       # Linter
       nvim-lint
-
-      # AI
-      codecompanion-nvim
 
       # Git
       lazygit-nvim # TODO: da mettere in gitPlugins ?
@@ -327,7 +372,6 @@ inputs:
       telescope-manix
 
       # Lsp
-      nvim-lspconfig
       openscad-nvim
 
       #idris2-nvim
@@ -346,7 +390,6 @@ inputs:
       # Markdown
       render-markdown-nvim
       markdown-preview-nvim
-      obsidian-nvim
 
       # Latex watching
       vimtex
@@ -355,33 +398,6 @@ inputs:
       #pkgs.neovimPlugins.treesitter-textobjects
       nvim-treesitter.withAllGrammars
       nvim-treesitter-parsers.markdown_inline
-      #(nvim-treesitter.withPlugins (plugins: with plugins; [
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.bash
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.c
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.cpp
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.go
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.html
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.javascript
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.json
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.lua
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.markdown
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.markdown_inline
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.python
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.query
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.rust
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.toml
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.typescript
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.vim
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.vimdoc
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.yaml
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.nix
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.markdown
-      #  pkgs.vimPlugins.nvim-treesitter-parsers.markdown_inline
-      #  # Aggiungi qui altri parser di cui hai bisogno
-      #]))
-
-      #(nvim-treesitter.withPlugins (plugins: with plugins; [ nix lua python javascript markdown markdown_inline bash vim vimdoc query c cpp rust ]))
-
     ];
   };
 

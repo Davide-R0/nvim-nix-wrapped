@@ -1,6 +1,3 @@
--- init.lua
-
--- [1. MANTIENI IL SETUP INIZIALE DEL TEMPLATE]
 vim.loader.enable()
 do
   local ok
@@ -18,7 +15,6 @@ do
   end
 end
 
--- [2. MANTIENI GLI HANDLERS (auto_enable, for_cat, ecc.)]
 nixInfo.lze.register_handlers {
   {
     spec_field = "auto_enable",
@@ -70,12 +66,9 @@ nixInfo.lze.h.lsp.set_ft_fallback(function(name)
   end
 end)
 
--- [3. IMPOSTAZIONI GLOBALI]
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
 require("config.options")
 require("config.keymaps")
+require("config.commands")
 
 local mod_dir_to_spec = require("lzextras").mod_dir_to_spec
 
@@ -90,6 +83,16 @@ if f ~= nil then
   local ok, res = pcall(dofile, dankcolors_path)
   if ok and type(res) == "table" then
     for _, spec in ipairs(res) do
+      -- CONVERSIONE AL VOLO:
+      -- 1. Rinomina il pacchetto da "RRethy/base16-nvim" a "base16-nvim"
+      if spec[1] == "RRethy/base16-nvim" then
+        spec[1] = "base16-nvim"
+      end
+      -- 2. Sposta config in after
+      if spec.config then
+        spec.after = spec.config
+        spec.config = nil
+      end
       table.insert(raw_specs, spec)
     end
   else
@@ -97,69 +100,17 @@ if f ~= nil then
   end
 end
 
-table.insert(raw_specs, {
-  "trigger_colorscheme",
-  event = "VimEnter",
-  load = function(_name)
-    vim.schedule(function()
-      vim.cmd.colorscheme(nixInfo("onedark_dark", "settings", "colorscheme"))
-    end)
-  end
-})
-
--- Deduplicate specs and merge dep_of lists
 local specs = {}
-local seen_plugins = {}
-
-local function merge_lists(t1, t2)
-  if not t1 then return t2 end
-  if not t2 then return t1 end
-  local res = {}
-  local seen = {}
-  for _, v in ipairs(t1) do
-    if not seen[v] then
-      table.insert(res, v)
-      seen[v] = true
-    end
-  end
-  for _, v in ipairs(t2) do
-    if not seen[v] then
-      table.insert(res, v)
-      seen[v] = true
-    end
-  end
-  return res
-end
-
-for _, spec in ipairs(raw_specs) do
-  local name = spec[1] or spec.name
-  if name then
-    if not seen_plugins[name] then
-      seen_plugins[name] = spec
+for _, file_specs in ipairs(raw_specs) do
+  -- Se il file restituisce una lista di spec (es: return { { "plug1" }, { "plug2" } })
+  -- dobbiamo iterare su di essa e aggiungerla piatta.
+  if file_specs[1] and type(file_specs[1]) == "table" then
+    for _, spec in ipairs(file_specs) do
       table.insert(specs, spec)
-    else
-      local existing = seen_plugins[name]
-      
-      -- Merge dep_of
-      if spec.dep_of then
-        existing.dep_of = merge_lists(existing.dep_of, spec.dep_of)
-      end
-      
-      -- Merge on_plugin
-      if spec.on_plugin then
-        existing.on_plugin = merge_lists(existing.on_plugin, spec.on_plugin)
-      end
-      
-      -- Prefer the spec that has an `after`, `before` or `opts` if the existing doesn't
-      if not existing.after and spec.after then existing.after = spec.after end
-      if not existing.before and spec.before then existing.before = spec.before end
-      if not existing.opts and spec.opts then existing.opts = spec.opts end
-      if not existing.ft and spec.ft then existing.ft = spec.ft end
-      if not existing.cmd and spec.cmd then existing.cmd = spec.cmd end
-      if not existing.event and spec.event then existing.event = spec.event end
     end
   else
-    table.insert(specs, spec)
+    -- Altrimenti se è una spec singola
+    table.insert(specs, file_specs)
   end
 end
 

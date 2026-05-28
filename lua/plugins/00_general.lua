@@ -1,24 +1,59 @@
 return {
   {
-    "typst-preview.nvim",
+    "nvim-web-devicons",
+
+    enabled = vim.g.have_nerd_font,
     auto_enable = true,
+    lazy = true,
+
+    dep_of = { "alpha-nvim", "oil.nvim", "telescope.nvim", "lualine.nvim", "render-markdown.nvim" }
+  },
+  {
+    "typst-preview.nvim",
+
+    enabled = true,
+    auto_enable = false,
+
     ft = 'typst',
     version = '1.*',
+
+    after = function(plugin)
+      require("typst-preview").setup(plugin.opts)
+    end,
     opts = {},
   },
   {
     "calendar.vim",
+
+    enabled = true,
     auto_enable = true,
+    lazy = true,
+
+    cmd = { "Calendar" },
+
     after = function()
-      -- Configurazione opzionale: inizia la settimana di lunedì
       vim.g.calendar_monday = 1
     end
   },
   {
     "conform.nvim",
-    auto_enable = true,
+
+    enabled = true,
+    auto_enable = false,
+    lazy = true,
+
+    event = { "BufWritePre" },
+
+    after = function(plugin)
+      local opts = plugin.opts
+      if type(opts) == "function" then
+        opts = opts()
+      end
+      require("conform").setup(opts)
+    end,
     opts = function()
-      local md_line_length = 80 
+      local md_line_length = nixInfo(80, "settings", "conform", "md_line_length")
+
       return {
         formatters_by_ft = {
           markdown = { "prettier", "markdownlint-cli2" },
@@ -36,15 +71,42 @@ return {
     end,
   },
   {
+    "nvim-autopairs",
+
+    enabled = true,
+    auto_enable = false,
+    lazy = true,
+
+    event = { "InsertEnter" },
+
+    after = function()
+      require('nvim-autopairs').setup {}
+      local cmp_autopairs = require 'nvim-autopairs.completion.cmp'
+      local cmp = require 'cmp'
+      cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
+    end,
+  },
+  {
     "fzf.vim",
+
+    enabled = true,
     auto_enable = true,
-    dep_of = { "openscad.nvim" },
+    lazy = true,
+
+    dep_of = { "openscad.nvim" }, -- TODO: forse servve anche ad lualine?
+
     after = function()
     end,
   },
   {
     "openscad.nvim",
-    auto_enable = true,
+
+    enabled = true,
+    auto_enable = false,
+    lazy = true,
+
+    ft = { "openscad" },
+
     after = function()
       vim.g.openscad_load_snippets = true
       require("openscad")
@@ -52,25 +114,51 @@ return {
   },
   {
     "luasnip",
+
+    enabled = true,
     auto_enable = true,
-    dep_of = { "openscad.nvim" }
+    lazy = true,
+
+    dep_of = { "nvim-cmp", "openscad.nvim" }
   },
   {
     "actions-preview.nvim",
-    auto_enable = true,
-    after = function()
-      vim.keymap.set({ "v", "n" }, '<leader>ca', require("actions-preview").code_actions)
-    end,
+
+    enabled = true,
+    auto_enable = false,
+    lazy = true,
+
+    dep_of = { "telescope.nvim" },
+    keys = {
+      { "<leader>ca", function() require("actions-preview").code_actions() end, mode = { "v", "n" }, desc = "Code Actions Preview" },
+    },
   },
   {
     "nvim-colorizer.lua",
-    auto_enable = true,
+
     enabled = true,
+    auto_enable = false,
+    lazy = true,
+
+    event = { "BufReadPost", "BufEnter" },
+
+    after = function(plugin)
+      require("colorizer").setup(plugin.opts)
+    end,
     opts = {},
   },
   {
     "csvview.nvim",
-    auto_enable = true,
+
+    enabled = true,
+    auto_enable = false,
+    lazy = true,
+
+    cmd = { "CsvViewEnable", "CsvViewDisable", "CsvViewToggle" },
+
+    after = function(plugin)
+      require("csvview").setup(plugin.opts)
+    end,
     opts = {
       parser = { comments = { "#", "//" } },
       keymaps = {
@@ -82,20 +170,24 @@ return {
         jump_prev_row = { "<S-Enter>", mode = { "n", "v" } },
       },
     },
-    cmd = { "CsvViewEnable", "CsvViewDisable", "CsvViewToggle" },
   },
   {
     "vim-table-mode",
+
+    enabled = true,
     auto_enable = true,
+    lazy = true,
+
     ft = { "markdown", "pandoc" },
     cmd = { "TableModeToggle", "TableModeEnable" },
+
     before = function()
       vim.g.table_mode_corner = "|"
       vim.g.table_mode_corner_corner = "|"
       vim.g.table_mode_header_fillchar = "-"
       vim.g.table_mode_disable_mappings = 1
-    end,
-    after = function()
+      --end,
+      --after = function()
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "markdown",
         callback = function()
@@ -106,52 +198,69 @@ return {
   },
   {
     "cornelis",
+
+    enabled = true,
     auto_enable = true,
+    lazy = true,
+
     ft = 'agda',
     version = '*',
     after = function()
-      vim.g.cornelis_use_global_binary = 1 
+      vim.g.cornelis_use_global_binary = 1
     end,
   },
   {
     "nvim-hs.vim",
+    enabled = true,
     auto_enable = true,
+    lazy = true,
+
     dep_of = { "cornelis" }
   },
   {
     "vim-textobj-user",
+
+    enabled = true,
     auto_enable = true,
+    lazy = true,
+
     dep_of = { "cornelis" }
   },
   {
-    "markdown-preview.nvim",
-    auto_enable = true,
-    for_cat = 'markdown',
-    cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle", },
-    ft = "markdown",
-    keys = {
-      { "<leader>mp", "<cmd>MarkdownPreview <CR>",       mode = { "n" }, noremap = true, desc = "markdown preview" },
-      { "<leader>ms", "<cmd>MarkdownPreviewStop <CR>",   mode = { "n" }, noremap = true, desc = "markdown preview stop" },
-      { "<leader>mt", "<cmd>MarkdownPreviewToggle <CR>", mode = { "n" }, noremap = true, desc = "markdown preview toggle" },
-    },
-    before = function(plugin)
-      vim.g.mkdp_auto_close = 0
-    end,
-  },
-  {
     "todo-comments.nvim",
-    auto_enable = true,
-    event = 'VimEnter',
+
+    enabled = true,
+    auto_enable = false,
+    lazy = true,
+
+    event = 'BufReadPost',
+
+    after = function(plugin)
+      require("todo-comments").setup(plugin.opts)
+    end,
     opts = { signs = false }
   },
   {
     "plenary.nvim",
+
+    enabled = true,
     auto_enable = true,
-    dep_of = { "todo-comments.nvim", "lazygit.nvim" }
+    lazy = true,
+
+    dep_of = { "todo-comments.nvim", "lazygit.nvim", "telescope.nvim", "obsidian.nvim", "lean.nvim", "codecompanion.nvim", "neorg" }
   },
   {
     "fidget.nvim",
-    auto_enable = true,
+
+    enabled = true,
+    auto_enable = false,
+    lazy = true,
+
+    event = "LspAttach",
+
+    after = function(plugin)
+      require("fidget").setup(plugin.opts)
+    end,
     opts = {
       notification = {
         window = {
@@ -162,8 +271,16 @@ return {
   },
   {
     "lazydev.nvim",
-    auto_enable = true,
+
+    enabled = true,
+    auto_enable = false,
+    lazy = true,
+
     ft = 'lua',
+
+    after = function(plugin)
+      require("lazydev").setup(plugin.opts)
+    end,
     opts = {
       library = {
         { path = "luvit-meta/library", words = { "vim%.uv" } },
@@ -172,26 +289,52 @@ return {
   },
   {
     "popup.nvim",
+
+    enabled = true,
     auto_enable = true,
-    enable = true,
-    event = "DeferredUIEnter",
+    lazy = true,
+
+    dep_of = { "telescope.nvim" }
   },
   {
     "nvim-spectre",
+
+    enabled = true,
     auto_enable = true,
-    enable = true,
-    event = "DeferredUIEnter",
+    lazy = true,
+
+    cmd = { "Spectre" },
+    keys = {
+      { "<leader>S",  function() require("spectre").toggle() end,                                 mode = "n", desc = "Toggle Spectre" },
+      { "<leader>sw", function() require("spectre").open_visual({ select_word = true }) end,      mode = "n", desc = "Search current word" },
+      { "<leader>sw", function() require("spectre").open_visual() end,                            mode = "v", desc = "Search current word" },
+      { "<leader>sp", function() require("spectre").open_file_search({ select_word = true }) end, mode = "n", desc = "Search on current file" }
+    }
   },
   {
     "undotree",
+
+    enabled = true,
     auto_enable = true,
-    enable = true,
-    event = "DeferredUIEnter",
+    lazy = true,
+
+    cmd = { "UndotreeToggle" },
+    keys = {
+      { "<leader>u", "<cmd>UndotreeToggle<cr>", mode = "n", desc = "Toggle UndoTree" }
+    }
   },
   {
     "gitsigns.nvim",
-    auto_enable = true,
-    event = "BufReadPre",
+
+    enabled = true,
+    auto_enable = false,
+    lazy = true,
+
+    event = { "BufReadPre", "BufNewFile" }, -- meglio  "BufReadPre"?
+
+    after = function(plugin)
+      require("gitsigns").setup(plugin.opts)
+    end,
     opts = {
       current_line_blame = true,
       current_line_blame_opts = {
@@ -205,21 +348,33 @@ return {
   },
   {
     "lazygit.nvim",
+
+    enabled = true,
     auto_enable = true,
+    lazy = true,
+
     cmd = { "LazyGit", "LazyGitConfig", "LazyGitCurrentFile", "LazyGitFilter", "LazyGitFilterCurrentFile", },
     keys = {
-      { "<leader>gg", "<cmd>LazyGit<cr>", desc = "LazyGit" }
+      { "<leader>gg", "<cmd>LazyGit<cr>", mode = "n", desc = "LazyGit" }
     }
   },
   {
     "diffview.nvim",
-    auto_enable = true,
+
+    enabled = true,
+    auto_enable = false,
+    lazy = true,
+
     cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewFileHistory" },
     keys = {
-      { "<leader>gd", "<cmd>DiffviewOpen<cr>",          desc = "Diff View Open" },
-      { "<leader>gc", "<cmd>DiffviewClose<cr>",         desc = "Diff View Close" },
-      { "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "File History" },
+      { "<leader>gd", "<cmd>DiffviewOpen<cr>",          mode = "n", desc = "Diff View Open" },
+      { "<leader>gc", "<cmd>DiffviewClose<cr>",         mode = "n", desc = "Diff View Close" },
+      { "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", mode = "n", desc = "File History" },
     },
+
+    after = function(plugin)
+      require("diffview").setup(plugin.opts)
+    end,
     opts = {
       enhanced_diff_hl = true,
       view = { default = { layout = "diff2_horizontal" } }
@@ -227,23 +382,35 @@ return {
   },
   {
     "vim-fugitive",
+
+    enabled = true,
     auto_enable = true,
+    lazy = true,
+
     cmd = { "G", "Git" },
     keys = {
-      { "<leader>gb", "<cmd>Git blame<cr>", desc = "Git Blame" },
+      { "<leader>gb", "<cmd>Git blame<cr>", mode = "n", desc = "Git Blame" },
     }
   },
   {
     "crates.nvim",
-    auto_enable = true,
+
+    enabled = true,
+    auto_enable = false,
+    lazy = true,
+
     event = { "BufRead Cargo.toml" },
+
+    after = function(plugin)
+      require("crates").setup(plugin.opts)
+    end,
     opts = {
       lsp = {
         enabled = true,
         completion = true,
         actions = true,
         hover = true,
-        on_attach = function(client, bufnr)
+        on_attach = function(_, bufnr)
           local crates = require("crates")
           vim.keymap.set("n", "<leader>ch", crates.open_homepage, { buffer = bufnr, desc = "Open Crate Homepage" })
           vim.keymap.set("n", "<leader>cv", crates.show_versions_popup, { buffer = bufnr, desc = "Show Crate Versions" })

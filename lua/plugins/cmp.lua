@@ -1,19 +1,43 @@
 return {
   {
     "nvim-cmp",
-    auto_enable = true,
-    event = { 'InsertEnter', 'CmdlineEnter' },
+
+    enable = true,
+    auto_enable = false,
+    lazy = false,
+
     after = function()
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
       luasnip.config.setup {}
 
       local kind_icons = {
-        Text = '', Method = '󰆧', Function = '󰊕', Constructor = '', Field = '󰇽',
-        Variable = '󰂡', Class = '󰠱', Interface = '', Module = '', Property = '󰜢',
-        Unit = '', Value = '󰎠', Enum = '', Keyword = '󰌋', Snippet = '', Color = '󰏘',
-        File = '󰈙', Reference = '', Folder = '󰉋', EnumMember = '', Constant = '󰏿',
-        Struct = '', Event = '', Operator = '󰆕', TypeParameter = '󰅲', CMPAI = '🤖',
+        Text = '',
+        Method = '󰆧',
+        Function = '󰊕',
+        Constructor = '',
+        Field = '󰇽',
+        Variable = '󰂡',
+        Class = '󰠱',
+        Interface = '',
+        Module = '',
+        Property = '󰜢',
+        Unit = '',
+        Value = '󰎠',
+        Enum = '',
+        Keyword = '󰌋',
+        Snippet = '',
+        Color = '󰏘',
+        File = '󰈙',
+        Reference = '',
+        Folder = '󰉋',
+        EnumMember = '',
+        Constant = '󰏿',
+        Struct = '',
+        Event = '',
+        Operator = '󰆕',
+        TypeParameter = '󰅲',
+        CMPAI = '🤖',
       }
 
       local format_func = function(entry, vim_item)
@@ -69,7 +93,7 @@ return {
         },
         mapping = cmp.mapping.preset.insert(get_mappings(false)),
         sources = cmp.config.sources({
-          { name = 'nvim_lsp', option = { markdown_oxide = { keyword_pattern = [[\(\k\| \|\/\|#\)\+]] } } },
+          { name = 'nvim_lsp',       option = { markdown_oxide = { keyword_pattern = [[\(\k\| \|\/\|#\)\+]] } } },
           { name = "neorg" },
           { name = 'luasnip' },
           { name = 'render-markdown' },
@@ -107,33 +131,38 @@ return {
     end,
   },
   {
-    "luasnip",
-    auto_enable = true,
-    dep_of = { "nvim-cmp" },
-  },
-  {
     "cmp_luasnip",
+    enable = true,
     auto_enable = true,
+    lazy = true,
     dep_of = { "nvim-cmp" },
   },
   {
     "cmp-nvim-lsp",
+    enable = true,
     auto_enable = true,
-    dep_of = { "nvim-cmp" },
+    lazy = true,
+    dep_of = { "nvim-cmp", "nvim-lspconfig" },
   },
   {
     "cmp-path",
+    enable = true,
     auto_enable = true,
+    lazy = true,
     dep_of = { "nvim-cmp" },
   },
   {
     "cmp-buffer",
+    enable = true,
     auto_enable = true,
+    lazy = true,
     dep_of = { "nvim-cmp" },
   },
   {
     "cmp-cmdline",
+    enable = true,
     auto_enable = true,
+    lazy = true,
     dep_of = { "nvim-cmp" },
   }
 }

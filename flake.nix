@@ -1,22 +1,27 @@
 {
   description = "Flake exporting a configured neovim package";
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-  inputs.wrappers.url = "github:BirdeeHub/nix-wrapper-modules";
-  inputs.wrappers.inputs.nixpkgs.follows = "nixpkgs";
-  #inputs.rust-overlay = {
-  #  url = "github:oxalica/rust-overlay";
-  #  inputs.nixpkgs.follows = "nixpkgs";
-  #};
-  # Demo on fetching plugins from outside nixpkgs
-  inputs.plugins-lze = {
-    url = "github:BirdeeHub/lze";
-    flake = false;
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    wrappers = {
+      url = "github:BirdeeHub/nix-wrapper-modules";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    #inputs.rust-overlay = {
+    #  url = "github:oxalica/rust-overlay";
+    #  inputs.nixpkgs.follows = "nixpkgs";
+    #};
+
+    plugins-lze = {
+      url = "github:BirdeeHub/lze";
+      flake = false;
+    };
+    plugins-lzextras = {
+      url = "github:BirdeeHub/lzextras";
+      flake = false;
+    };
   };
-  # These 2 are already in nixpkgs, however this ensures you always fetch the most up to date version!
-  inputs.plugins-lzextras = {
-    url = "github:BirdeeHub/lzextras";
-    flake = false;
-  };
+
   outputs =
     {
       self,
@@ -29,7 +34,6 @@
       module = nixpkgs.lib.modules.importApply ./module.nix inputs;
       wrapper = wrappers.lib.evalModule module;
     in
-    # for demonstration purposes, we will set up all the outputs.
     {
       wrapperModules = {
         neovim = module;
@@ -40,7 +44,7 @@
         default = self.wrappers.neovim;
       };
       overlays = {
-        neovim = final: prev: { neovim = self.wrappers.neovim.wrap { pkgs = final; }; };
+        neovim = final: _: { neovim = self.wrappers.neovim.wrap { pkgs = final; }; };
         default = self.overlays.neovim;
       };
       packages = forAllSystems (
@@ -70,7 +74,7 @@
       homeModules = {
         default = self.homeModules.neovim;
         # they produce generically importable modules
-        neovim = self.nixosModules.neovim;
+        inherit (self.nixosModules) neovim;
       };
     };
 }

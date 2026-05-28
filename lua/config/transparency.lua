@@ -1,34 +1,7 @@
---vim.api.nvim_set_hl(0, "SignColumn", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "ColorColumn", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "CursorLineSign", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "FoldColumn", { bg = "NONE", ctermbg = "NONE" })
---
---vim.api.nvim_set_hl(0, "DiffAdd", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "DiffChange", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "DiffDelete", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "DiffText", { bg = "NONE", ctermbg = "NONE" })
---
---vim.api.nvim_set_hl(0, "GitSignsAdd", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "GitSignsChange", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "GitSignsDelete", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "GitSignsUntracked", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "GitSignsChangedelete", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "GitSignsTopdelete", { bg = "NONE", ctermbg = "NONE" })
----- Staged
---vim.api.nvim_set_hl(0, "GitSignsStagedAdd", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "GitSignsStagedChange", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "GitSignsStagedDelete", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "GitSignsStagedUntracked", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "GitSignsStagedChangedelete", { bg = "NONE", ctermbg = "NONE" })
---vim.api.nvim_set_hl(0, "GitSignsStagedTopdelete", { bg = "NONE", ctermbg = "NONE" })
-
--- NOTE: when you change the theme you have to close and restart nvim to reload the trasparency
-
-vim.api.nvim_create_autocmd({"ColorScheme", "VimEnter"}, { --, "BufEnter"
+vim.api.nvim_create_autocmd({ "ColorScheme", "VimEnter" }, {
   pattern = "*",
   desc = "Force transparent background for UI elements",
   callback = function()
-    -- FUNZIONE SICURA PER LA TRASPARENZA
     -- Questa funzione legge il colore esistente e rimuove SOLO lo sfondo, preservando il colore del testo (fg), il grassetto, ecc.
     local function set_transparent(group)
       -- Ottieni le proprietà attuali del gruppo (risolvendo i link)
@@ -51,7 +24,7 @@ vim.api.nvim_create_autocmd({"ColorScheme", "VimEnter"}, { --, "BufEnter"
       --"Comment", "Constant", "Special", "Identifier",
       --"Statement", "PreProc", "Type", "Underlined", "Todo", "String", "Function",
       --"Conditional", "Repeat", "Operator", "Structure", "LineNr", "NonText",
-      --"CursorLine", 
+      --"CursorLine",
       --"CursorLineNr",
       "StatusLine", "StatusLineNC", "EndOfBuffer",
       -- Cmp
@@ -61,7 +34,7 @@ vim.api.nvim_create_autocmd({"ColorScheme", "VimEnter"}, { --, "BufEnter"
       -- === TELESCOPE (Ricerca file) ===
       "TelescopeNormal",
       -- === FIDGET (Notifiche LSP) ===
-      "FidgetNormal", "FidgetBorder", --"FidgetTask", "FidgetTitle", 
+      "FidgetNormal", "FidgetBorder", --"FidgetTask", "FidgetTitle",
       -- === WHICHKEY (Menu suggerimenti tasti) ===
       "WhichKey", "WhichKeyFloat", "WhichKeyGroup",
       -- === NEO-TREE / NVIM-TREE (File Explorer laterale) ===
@@ -81,7 +54,7 @@ vim.api.nvim_create_autocmd({"ColorScheme", "VimEnter"}, { --, "BufEnter"
       -- Base diff groups
       "DiffAdd", "DiffChange", "DiffDelete", "DiffText",
 
-      -- Git signs 
+      -- Git signs
       "GitSignsAdd",
       "GitSignsChange",
       "GitSignsDelete",
@@ -145,7 +118,7 @@ vim.api.nvim_create_autocmd({"ColorScheme", "VimEnter"}, { --, "BufEnter"
       set_transparent(group)
     end
 
-    -- "LazyButtonActive": Il bottone/tab selezionato. 
+    -- "LazyButtonActive": Il bottone/tab selezionato.
     -- Lo linkiamo a "Visual" (solitamente grigio/blu scuro nel tuo tema) o "CursorLine"
     vim.api.nvim_set_hl(0, "LazyButtonActive", { link = "Visual" })
     -- "LazyH1": I titoli principali. Lo linkiamo a "Title" o "Special" del tema
