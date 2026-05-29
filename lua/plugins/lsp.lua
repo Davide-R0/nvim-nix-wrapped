@@ -1,16 +1,17 @@
 return {
   {
     "nvim-lspconfig",
-
     enabled = true,
     auto_enable = true,
     lazy = false,
-
     dep_of = { "lean.nvim" },
 
     lsp = function(plugin)
       local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+      local ok_cmp, cmp_lsp = pcall(require, 'cmp_nvim_lsp')
+      if ok_cmp then
+        capabilities = vim.tbl_deep_extend('force', capabilities, cmp_lsp.default_capabilities())
+      end
 
       local config = vim.tbl_deep_extend('force', {
         capabilities = capabilities,
@@ -20,7 +21,7 @@ return {
       vim.lsp.enable(plugin.name)
     end,
 
-    before = function(_)
+    before = function()
       -- Configurazione grafica della diagnostica
       vim.diagnostic.config({
         signs = {
@@ -46,9 +47,8 @@ return {
       })
 
       vim.lsp.config('*', {
-        on_attach = function(_, bufnr)
-          -- we create a function that lets us more easily define mappings specific
-          -- for LSP related items. It sets the mode, buffer and description for us each time.
+        on_attach = function(client, bufnr)
+          -- Funzione helper per definire scorciatoie
           local nmap = function(keys, func, desc)
             if desc then
               desc = 'LSP: ' .. desc
@@ -56,13 +56,13 @@ return {
             vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
           end
 
-          nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+          nmap('gd', '<cmd>Telescope lsp_definitions<CR>', '[G]oto [D]efinition')
           nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-          nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-          nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-          nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-          nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-          nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+          nmap('gr', '<cmd>Telescope lsp_references<CR>', '[G]oto [R]eferences')
+          nmap('gI', '<cmd>Telescope lsp_implementations<CR>', '[G]oto [I]mplementation')
+          nmap('<leader>D', '<cmd>Telescope lsp_type_definitions<CR>', 'Type [D]efinition')
+          nmap('<leader>ds', '<cmd>Telescope lsp_document_symbols<CR>', '[D]ocument [S]ymbols')
+          nmap('<leader>ws', '<cmd>Telescope lsp_dynamic_workspace_symbols<CR>', '[W]orkspace [S]ymbols')
           nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
           nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
           nmap('<leader>e', vim.diagnostic.open_float, 'Show diagnostic [E]rror')
@@ -71,119 +71,56 @@ return {
           nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
           nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
-          -- Lesser used LSP functionality
-          --nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
           nmap('<leader>wl', function()
             print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
           end, '[W]orkspace [L]ist Folders')
 
-          -- Create a command `:Format` local to the LSP buffer
+          -- Comando :Format locale al buffer
           vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
             vim.lsp.buf.format()
           end, { desc = 'Format current buffer with LSP' })
 
-          -- highlight cursore
-          local client = vim.lsp.get_client_by_id(_)
+          -- Highlight del cursore se supportato dal server LSP
           if client and client.server_capabilities.documentHighlightProvider then
             local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
-            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' },
-              {
-                buffer = bufnr,
-                group = highlight_augroup,
-                callback = vim.lsp.buf.document_highlight,
-              })
-            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' },
-              {
-                buffer = bufnr,
-                group = highlight_augroup,
-                callback = vim.lsp.buf.clear_references,
-              })
+            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+              buffer = bufnr,
+              group = highlight_augroup,
+              callback = vim.lsp.buf.document_highlight,
+            })
+            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+              buffer = bufnr,
+              group = highlight_augroup,
+              callback = vim.lsp.buf.clear_references,
+            })
           end
         end
       })
     end,
-
-    -- questo metodo sembra non funzionare...
-    --vim.api.nvim_create_autocmd('LspAttach', {
-    --  group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
-    --  callback = function(event)
-    --    local map = function(keys, func, desc)
-    --      vim.keymap.set('n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
-    --    end
-
-    --    map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-    --    map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-    --    map('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-    --    map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-    --    map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-    --    map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
-    --    map('<leader>e', vim.diagnostic.open_float, 'Show diagnostic [E]rror')
-    --    map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-    --    map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
-    --    map('K', vim.lsp.buf.hover, 'Hover Documentation')
-    --    map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-
-    --    local client = vim.lsp.get_client_by_id(event.data.client_id)
-    --    if client and client.server_capabilities.documentHighlightProvider then
-    --      local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
-    --      vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-    --        buffer = event.buf,
-    --        group = highlight_augroup,
-    --        callback = vim.lsp.buf.document_highlight,
-    --      })
-    --      vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-    --        buffer = event.buf,
-    --        group = highlight_augroup,
-    --        callback = vim.lsp.buf.clear_references,
-    --      })
-    --      vim.api.nvim_create_autocmd('LspDetach', {
-    --        group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
-    --        callback = function(event2)
-    --          vim.lsp.buf.clear_references()
-    --          vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
-    --        end,
-    --      })
-    --    end
-
-    --    if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
-    --      map('<leader>th', function()
-    --        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-    --      end, '[T]oggle Inlay [H]ints')
-    --    end
-    --  end,
-    --})
   },
 
   {
     "nixd",
-
-    --for_cat = "nix",
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "nix" },
-    lsp = {}
+    lsp = {
+      settings = {
+        nixd = {
+          nixpkgs = { expr = [[import <nixpkgs> {}]] },
+          formatting = { command = { "nixfmt" } }
+        }
+      }
+    }
   },
 
   {
     "lua_ls",
-
-    --for_cat = "lua",
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "lua" },
     lsp = {
       settings = {
         Lua = {
           signatureHelp = { enabled = true },
           completion = { callSnippet = 'Replace' },
-          diagnostics = {
-            globals = { "nixInfo", "vim", },
-            disable = { 'missing-fields' },
-          },
+          diagnostics = { globals = { "nixInfo", "vim" }, disable = { "missing-fields" } },
         },
       },
     },
@@ -191,11 +128,6 @@ return {
 
   {
     "html",
-
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "html", "templ" },
     lsp = {
       cmd = { "vscode-html-language-server", "--stdio" },
@@ -209,32 +141,18 @@ return {
 
   {
     "clangd",
-
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "c", "cpp" },
     lsp = {}
   },
+
   {
     "hls",
-
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "haskell" },
     lsp = {}
   },
 
   {
     "rust_analyzer",
-
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "rust" },
     lsp = {
       settings = {
@@ -245,11 +163,6 @@ return {
 
   {
     "texlab",
-
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "tex" },
     lsp = {
       settings = {
@@ -274,11 +187,6 @@ return {
 
   {
     "tinymist",
-
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "typst" },
     lsp = {
       cmd = { "tinymist" },
@@ -292,22 +200,12 @@ return {
 
   {
     "markdown_oxide",
-
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "markdown" },
     lsp = {}
   },
 
   {
     "leanls",
-
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "lean" },
     lsp = {
       init_options = {
@@ -319,11 +217,6 @@ return {
 
   {
     "taplo",
-
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "toml" },
     lsp = {
       settings = {
@@ -334,61 +227,36 @@ return {
 
   {
     "bashls",
-
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "sh" },
     lsp = {}
   },
+
   {
     "cmake",
-
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "cmake" },
     lsp = {}
   },
+
   {
     "openscad_lsp",
-
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "openscad" },
     lsp = {}
   },
+
   {
     "asm_lsp",
-
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "asm", "s", "S" },
     lsp = {}
   },
+
   {
     "basedpyright",
-
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "python" },
     lsp = {}
   },
+
   {
     "ts_ls",
-
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
-
     ft = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
     lsp = {}
   },
