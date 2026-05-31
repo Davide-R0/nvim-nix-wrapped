@@ -58,7 +58,6 @@
         let
           pkgs = import nixpkgs {
             inherit system;
-            config.allowUnfree = true; # TODO: il plugin vim-table-mode ha una licenza non free, poi toglierlo!!
           };
         in
         {
