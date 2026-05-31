@@ -146,6 +146,14 @@ return {
   },
 
   {
+    "unison",
+    ft = { "unison" },
+    lsp = {
+      cmd = { "nc", "localhost", "5757" }
+    }
+  },
+
+  {
     "hls",
     ft = { "haskell" },
     lsp = {}
