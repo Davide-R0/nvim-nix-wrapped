@@ -2,146 +2,81 @@ vim.api.nvim_create_autocmd({ "ColorScheme", "VimEnter" }, {
   pattern = "*",
   desc = "Force transparent background for UI elements",
   callback = function()
-    -- Questa funzione legge il colore esistente e rimuove SOLO lo sfondo, preservando il colore del testo (fg), il grassetto, ecc.
+    -- Funzione per rimuovere solo lo sfondo, preservando fg e stili
     local function set_transparent(group)
-      -- Ottieni le proprietà attuali del gruppo (risolvendo i link)
+      ---@type any
       local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
       if not hl or vim.tbl_isempty(hl) then return end
-      -- Imposta solo lo sfondo a NONE, mantenendo il resto (hl.fg, hl.bold, ecc.)
-      hl.bg = "NONE"
-      hl.ctermbg = "NONE"
+      hl.bg = nil
+      hl.ctermbg = nil
       hl.force = true
-      -- Riapplica il gruppo modificato
       vim.api.nvim_set_hl(0, group, hl)
     end
 
-    -- LISTA DEI GRUPPI DA RENDERE TRASPARENTI
-    -- Can be fouded with: Telescope hilights
+    -- Gruppi base, ui e plugin
     local groups = {
-      -- TODO: add all the gitsigns of Cul Nr e Ln
-      -- === BASE EDITOR ===
-      "Normal", "NormalNC",
-      --"Comment", "Constant", "Special", "Identifier",
-      --"Statement", "PreProc", "Type", "Underlined", "Todo", "String", "Function",
-      --"Conditional", "Repeat", "Operator", "Structure", "LineNr", "NonText",
-      --"CursorLine",
-      --"CursorLineNr",
-      "StatusLine", "StatusLineNC", "EndOfBuffer",
-      -- Cmp
+      "Normal", "NormalNC", "StatusLine", "StatusLineNC", "EndOfBuffer",
       "CmpItemAbbr", "CmpItemAbbrDeprecated", "CmpItemAbbrMatch", "CmpDocumentation", "CmpDocumentationBorder",
-      -- === FINESTRE FLOTTANTI E MENU ===
       "NormalFloat", "FloatBorder", "Pmenu", "PmenuBorder",
-      -- === TELESCOPE (Ricerca file) ===
-      "TelescopeNormal",
-      -- === FIDGET (Notifiche LSP) ===
-      "FidgetNormal", "FidgetBorder", --"FidgetTask", "FidgetTitle",
-      -- === WHICHKEY (Menu suggerimenti tasti) ===
+      "TelescopeNormal", "FidgetNormal", "FidgetBorder",
       "WhichKey", "WhichKeyFloat", "WhichKeyGroup",
-      -- === NEO-TREE / NVIM-TREE (File Explorer laterale) ===
-      -- Se usi uno di questi due
-      --"NvimTreeNormal", "NvimTreeNormalNC", "NvimTreeWinSeparator", "NeoTreeNormal", "NeoTreeNormalNC", "NeoTreeWinSeparator",
-      -- === LAZY (Gestore Plugin) ===
       "LazyNormal", "MasonNormal",
-      -- === DIAGNOSTICA (Errori nel codice) ===
       "DiagnosticVirtualTextError", "DiagnosticVirtualTextWarn", "DiagnosticVirtualTextInfo", "DiagnosticVirtualTextHint",
-      -- === TREESITTER CONTEXT (Barra in alto che fissa la funzione) ===
       "TreesitterContext", "TreesitterContextLineNumber",
+      "SignColumn", "ColorColumn", "CursorLineSign", "FoldColumn",
+      --"DiffAdd", "DiffChange", "DiffDelete", "DiffText", -- se si mettono questi poi i diff in nvim non osno colorati
 
-      -- Sign columns
-      "SignColumn",
-      "ColorColumn",
-      "CursorLineSign", "FoldColumn",
-      -- Base diff groups
-      "DiffAdd", "DiffChange", "DiffDelete", "DiffText",
-
-      -- Git signs
-      "GitSignsAdd",
-      "GitSignsChange",
-      "GitSignsDelete",
-      "GitSignsUntracked",
-      "GitSignsChangedelete",
-      "GitSignsTopdelete",
-
-      "GitSignsAddNr",
-      "GitSignsChangeNr",
-      "GitSignsDeleteNr",
-      "GitSignsUntrackedNr",
-      "GitSignsChangedeleteNr",
-      "GitSignsTopdeleteNr",
-
-      "GitSignsAddLn",
-      "GitSignsChangeLn",
-      "GitSignsDeleteLn",
-      "GitSignsUntrackedLn",
-      "GitSignsChangedeleteLn",
-      "GitSignsTopdeleteLn",
-
-      "GitSignsAddCul",
-      "GitSignsChangeCul",
-      "GitSignsDeleteCul",
-      "GitSignsUntrackedCul",
-      "GitSignsChangedeleteCul",
-      "GitSignsTopdeleteCul",
-
-      -- Git signs staged
-      "GitSignsStagedAdd",
-      "GitSignsStagedChange",
-      "GitSignsStagedDelete",
-      "GitSignsStagedUntracked",
-      "GitSignsStagedChangedelete",
-      "GitSignsStagedTopdelete",
-
-      "GitSignsStagedAddNr",
-      "GitSignsStagedChangeNr",
-      "GitSignsStagedDeleteNr",
-      "GitSignsStagedUntrackedNr",
-      "GitSignsStagedChangedeleteNr",
-      "GitSignsStagedTopdeleteNr",
-
-      "GitSignsStagedAddLn",
-      "GitSignsStagedChangeLn",
-      "GitSignsStagedDeleteLn",
-      "GitSignsStagedUntrackedLn",
-      "GitSignsStagedChangedeleteLn",
-      "GitSignsStagedTopdeleteLn",
-
-      "GitSignsStagedAddCul",
-      "GitSignsStagedChangeCul",
-      "GitSignsStagedDeleteCul",
-      "GitSignsStagedUntrackedCul",
-      "GitSignsStagedChangedeleteCul",
-      "GitSignsStagedTopdeleteCul",
+      -- Telescope
+      --"TelescopeBorder", "TelescopeResultsBorder", "TelescopeResultsTitle",
+      --"TelescopePromptBorder", "TelescopePromptTitle", "TelescopePreviewBorder",
+      --"TelescopePreviewTitle", "TelescopePromptNormal", "TelescopePreviewNormal",
+      --"TelescopeResultsNormal", "TelescopePromptPrefix"
     }
 
-    -- Applica la trasparenza sicura
+    -- Generazione dinamica dei gruppi gitsigns
+    -- Genera automaticamente tutte le 48 combinazioni (Add, Change, Staged, Nr, Ln, Cul, ecc.)
+    local git_prefixes = { "GitSigns", "GitSignsStaged" }
+    local git_actions = { "Add", "Change", "Delete", "Untracked", "Changedelete", "Topdelete" }
+    local git_suffixes = { "", "Nr", "Ln", "Cul" }
+
+    for _, prefix in ipairs(git_prefixes) do
+      for _, action in ipairs(git_actions) do
+        for _, suffix in ipairs(git_suffixes) do
+          table.insert(groups, prefix .. action .. suffix)
+        end
+      end
+    end
+
+    -- Applica la trasparenza a tutti i gruppi
     for _, group in ipairs(groups) do
       set_transparent(group)
     end
 
-    -- "LazyButtonActive": Il bottone/tab selezionato.
-    -- Lo linkiamo a "Visual" (solitamente grigio/blu scuro nel tuo tema) o "CursorLine"
-    vim.api.nvim_set_hl(0, "LazyButtonActive", { link = "Visual" })
-    -- "LazyH1": I titoli principali. Lo linkiamo a "Title" o "Special" del tema
-    vim.api.nvim_set_hl(0, "LazyH1", { link = "Title" })
-    -- "LazySpecial": Testi speciali (spesso viola). Lo linkiamo a "Constant" o "String"
-    vim.api.nvim_set_hl(0, "LazySpecial", { link = "Constant" })
-    -- Assicura che quando selezioni qualcosa nei menu, si veda bene
-    vim.api.nvim_set_hl(0, "PmenuSel", { link = "Visual" })
+    -- Applica i collegamenti (links)
+    local links = {
+      LazyButtonActive = "Visual",
+      LazyH1 = "Title",
+      LazySpecial = "Constant",
+      PmenuSel = "Visual",
+      TelescopeSelection = "Visual",
+    }
+
+    for from, to in pairs(links) do
+      vim.api.nvim_set_hl(0, from, { link = to })
+    end
 
     -- Telescope
-    vim.api.nvim_set_hl(0, "TelescopeSelection", { link = "Visual" })
-    vim.api.nvim_set_hl(0, "TelescopeBorder", { bg = "NONE", ctermbg = "NONE" })
-    vim.api.nvim_set_hl(0, "TelescopeResultsBorder", { bg = "NONE", ctermbg = "NONE" })
-    vim.api.nvim_set_hl(0, "TelescopeResultsTitle", { bg = "NONE", ctermbg = "NONE" })
-    vim.api.nvim_set_hl(0, "TelescopePromptBorder", { bg = "NONE", ctermbg = "NONE" })
-    vim.api.nvim_set_hl(0, "TelescopePromptTitle", { bg = "NONE", ctermbg = "NONE" })
-    vim.api.nvim_set_hl(0, "TelescopePreviewBorder", { bg = "NONE", ctermbg = "NONE" })
-    vim.api.nvim_set_hl(0, "TelescopePreviewTitle", { bg = "NONE", ctermbg = "NONE" })
-    vim.api.nvim_set_hl(0, "TelescopePromptNormal", { bg = "NONE", ctermbg = "NONE" })
-    vim.api.nvim_set_hl(0, "TelescopePreviewNormal", { bg = "NONE", ctermbg = "NONE" })
-    vim.api.nvim_set_hl(0, "TelescopeResultsNormal", { bg = "NONE", ctermbg = "NONE" })
-    vim.api.nvim_set_hl(0, "TelescopePromptPrefix", { bg = "NONE", ctermbg = "NONE" })
-    --vim.api.nvim_set_hl(0, "TelescopeSelectionCaret", { bg = "NONE", ctermbg = "NONE" })
+    local telescope_groups = {
+      "TelescopeBorder", "TelescopeResultsBorder", "TelescopeResultsTitle",
+      "TelescopePromptBorder", "TelescopePromptTitle", "TelescopePreviewBorder",
+      "TelescopePreviewTitle", "TelescopePromptNormal", "TelescopePreviewNormal",
+      "TelescopeResultsNormal", "TelescopePromptPrefix"
+    }
+
+    for _, group in ipairs(telescope_groups) do
+      -- Passando solo bg=nil, si elimina il colore (fg) del tema
+      vim.api.nvim_set_hl(0, group, { bg = nil, ctermbg = nil })
+    end
   end,
 })
 

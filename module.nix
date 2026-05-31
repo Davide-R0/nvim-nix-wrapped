@@ -182,6 +182,7 @@ inputs:
       manix # TODO: rimuoverlo...
 
       # For latex
+      inputs.libtexprintf.packages.${pkgs.system}.default # per renderizzare le formule di latex nei file md
       #texlive.combined.scheme-full # O scheme-medium (Il compilatore LaTeX)
       zathura # Il visualizzatore PDF
       xdotool # FONDAMENTALE: serve a VimTeX per comunicare con Zathura

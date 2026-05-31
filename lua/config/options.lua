@@ -7,9 +7,6 @@ vim.g.maplocalleader = '\\'
 -- per norg
 set.conceallevel = 2
 
--- Enable mouse mode, can be useful for resizing splits for example!
---vim.opt.mouse = 'a'
---
 ---- Attiva il controllo ortografico
 --vim.opt.spell = true
 ---- Imposta le lingue (Italiano come principale, Inglese come secondario)
@@ -40,12 +37,6 @@ vim.o.shellcmdflag = "-c"
 -- On saving files
 set.backup = false
 set.swapfile = false
--- Undo save
---local undodir = vim.fn.stdpath("state") .. "/undo" --~/.local/state/nvim/undo
---if vim.fn.isdirectory(undodir) == 0 then
---  vim.fn.mkdir(undodir, "p")
---end
---set.undodir = undodir
 set.undofile = true
 
 -- for obsidian preview
@@ -60,13 +51,10 @@ set.number = true
 set.tabstop = 4
 set.shiftwidth = 4
 set.softtabstop = 4
-set.expandtab = true --per avere solo spazi e non tab
+set.expandtab = true
 
 -- Reload files changed outside nvim
 set.autoread = true
-
---Set Encoding -- dovrebeb averlo di default
---set.encoding = "utf-8"
 
 -- Search hilighting
 set.hlsearch = false
@@ -79,11 +67,8 @@ set.visualbell = true
 set.termguicolors = true
 
 --Scrolling setting
-set.scrolloff = 10         --lascia sempre un offset di righe
-vim.opt.signcolumn = "yes" --Attivazione barra sinistra per gli errori e vari (magari non necessaio)
-
--- Setting backspace key like delite
---set.backspace = "indent", "eol", "start"
+set.scrolloff = 10
+vim.opt.signcolumn = "yes"
 
 -- Autoindentation
 set.autoindent = true
@@ -108,27 +93,9 @@ vim.foldnestmax = 1
 vim.foldlevelstart = 1
 
 -- Set scrool number line
---vim.scrolloff = 2
-
----- Standard setup ----
-
--- Set Python directory
--- analogo ad let g:... = /...
--- TODO:
---vim.g['python3_host_prog'] = "/usr/bin/python3"
+vim.scrolloff = 3
 
 --Deactivate perl provider
 vim.g['loaded_perl_provider'] = 0
 --Deactivate ruby provider
 vim.g['loaded_ruby_provider'] = 0
-
--- Terminal
--- TODO: Ricontrollare
-vim.cmd [[
-let term_program=$TERM_PROGRAM
-]]
-
--- glsl hiligting
-vim.cmd [[
-autocmd! BufNewFile,BufRead *.vs,*.fs,*.cp,*.vert,*.frag,*.comp set ft=glsl
-]]

@@ -1,3 +1,4 @@
+# Lua LSP configuraiton file
 std = "vim"
 [config]
-globals = ["vim", "nixCats", "require"]
+globals = ["vim", "require"]

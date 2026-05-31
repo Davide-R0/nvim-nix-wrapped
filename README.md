@@ -6,6 +6,8 @@ input by a NixOS system, but can also be tested and built locally.
 
 ---
 
+$\hbar\ \frac{1}{2}$
+
 # Per testare in dev
 
 Usare `nix run .` o `nix build .` per testarlo.

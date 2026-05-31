@@ -20,6 +20,12 @@
       url = "github:BirdeeHub/lzextras";
       flake = false;
     };
+
+    # Per renderizzare in uft-8 le formule latex in markdown
+    libtexprintf = {
+      url = "github:xbwwj/libtexprintf-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

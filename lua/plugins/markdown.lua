@@ -38,10 +38,7 @@ return {
         border_prefix = false,
         above = '▁',
         below = '▔',
-        backgrounds = {
-          'RenderMarkdownH1Bg', 'RenderMarkdownH2Bg', 'RenderMarkdownH3Bg',
-          'RenderMarkdownH1Bg', 'RenderMarkdownH2Bg', 'RenderMarkdownH3Bg',
-        },
+        backgrounds = {},
         foregrounds = {
           'RenderMarkdownLink', 'RenderMarkdownLink', 'RenderMarkdownLink',
           'RenderMarkdownLink', 'RenderMarkdownLink', 'RenderMarkdownLink',
@@ -124,7 +121,8 @@ return {
         alignment_indicator = '━',
         head = 'RenderMarkdownTableHead',
         row = 'RenderMarkdownTableRow',
-        filler = 'RenderMarkdownTableFill',
+        -- Deprecated:?
+        --filler = 'RenderMarkdownTableFill',
       },
       callout = {},
       link = {
@@ -159,9 +157,10 @@ return {
         skip_level = 1,
         skip_heading = true,
       },
-      frontmatter = {
-        hidden = true,
-      },
+      -- Deprecated?
+      --frontmatter = {
+      --  hidden = true,
+      --},
     },
   },
   {

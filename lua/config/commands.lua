@@ -1,3 +1,23 @@
+-- Digrafi Personalizzati ℝ ℕ ℤ ℂ
+vim.cmd([[
+  digraph RR 8477
+  digraph NN 8469
+  digraph ZZ 8484
+  digraph CC 8450
+]])
+
+-- Riconoscimento file GLSL
+vim.filetype.add({
+  extension = {
+    vs = 'glsl',
+    fs = 'glsl',
+    cp = 'glsl',
+    vert = 'glsl',
+    frag = 'glsl',
+    comp = 'glsl',
+  }
+})
+
 -- PRINT
 vim.api.nvim_create_user_command(
   'Pprint',
