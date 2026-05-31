@@ -171,31 +171,31 @@ return {
       },
     },
   },
-  {
-    "vim-table-mode",
+  --{
+  --  "vim-table-mode",
 
-    enabled = true,
-    auto_enable = true,
-    lazy = true,
+  --  enabled = true,
+  --  auto_enable = true,
+  --  lazy = true,
 
-    ft = { "markdown", "pandoc" },
-    cmd = { "TableModeToggle", "TableModeEnable" },
+  --  ft = { "markdown", "pandoc" },
+  --  cmd = { "TableModeToggle", "TableModeEnable" },
 
-    before = function()
-      vim.g.table_mode_corner = "|"
-      vim.g.table_mode_corner_corner = "|"
-      vim.g.table_mode_header_fillchar = "-"
-      vim.g.table_mode_disable_mappings = 1
-      --end,
-      --after = function()
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = "markdown",
-        callback = function()
-          vim.cmd("TableModeEnable")
-        end,
-      })
-    end,
-  },
+  --  before = function()
+  --    vim.g.table_mode_corner = "|"
+  --    vim.g.table_mode_corner_corner = "|"
+  --    vim.g.table_mode_header_fillchar = "-"
+  --    vim.g.table_mode_disable_mappings = 1
+  --    --end,
+  --    --after = function()
+  --    vim.api.nvim_create_autocmd("FileType", {
+  --      pattern = "markdown",
+  --      callback = function()
+  --        vim.cmd("TableModeEnable")
+  --      end,
+  --    })
+  --  end,
+  --},
   {
     "cornelis",
 
