@@ -238,7 +238,28 @@ return {
     after = function(plugin)
       require("todo-comments").setup(plugin.opts)
     end,
-    opts = { signs = false }
+    opts = {
+      --signs = false,
+
+      colors = {
+        error   = { "DiagnosticError", "ErrorMsg", "#DC2626" },  -- Rosso
+        warning = { "DiagnosticWarn", "WarningMsg", "#FBBF24" }, -- Giallo
+        info    = { "DiagnosticInfo", "#2563EB" },               -- Blu
+        hint    = { "DiagnosticHint", "#10B981" },               -- Verde
+        default = { "Identifier", "#7C3AED" },                   -- Viola
+        my_todo = { "#FF00FF" }                                  -- Fucsia (Esempio personalizzato!)
+      },
+
+      keywords = {
+        FIX  = { icon = " ", color = "error", alt = { "FIXME", "BUG", "FIXIT", "ISSUE" } },
+        TODO = { icon = " ", color = "my_todo" },
+        HACK = { icon = " ", color = "warning" },
+        WARN = { icon = " ", color = "warning", alt = { "WARNING", "XXX" } },
+        PERF = { icon = " ", color = "default", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
+        NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
+        TEST = { icon = "⏲ ", color = "default", alt = { "TESTING", "PASSED", "FAILED" } },
+      },
+    }
   },
   {
     "plenary.nvim",
