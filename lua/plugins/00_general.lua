@@ -26,7 +26,7 @@ return {
     "calendar.vim",
 
     enabled = true,
-    auto_enable = true,
+    auto_enable = true, -- WARN : non dovrebbe esser false
     lazy = true,
 
     cmd = { "Calendar" },

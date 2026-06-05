@@ -103,11 +103,19 @@ return {
     "nixd",
     ft = { "nix" },
     lsp = {
+
+      root_markers = { "flake.nix", ".git" },
       settings = {
         nixd = {
-          nixpkgs = { expr = [[import <nixpkgs> {}]] },
+          nixpkgs = {
+            --expr = [[import <nixpkgs> {}]],
+            --expr = "import <nixpkgs> { }",
+            expr = 'import (builtins.getFlake "' .. vim.fn.getcwd() .. '").inputs.nixpkgs { }',
+          },
           formatting = { command = { "nixfmt" } }
-        }
+        },
+        options = {
+        },
       }
     }
   },

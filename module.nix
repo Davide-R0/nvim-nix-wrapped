@@ -187,6 +187,8 @@ inputs:
       zathura # Il visualizzatore PDF
       xdotool # FONDAMENTALE: serve a VimTeX per comunicare con Zathura
 
+      resvg # rendering svg
+
       # ====================
       # LSP
       # ====================
