@@ -1,4 +1,34 @@
 return {
+  --{
+  --  'plantuml-previewer.vim',
+
+  --  enabled = true,
+  --  auto_enable = true,
+  --  lazy = true,
+
+  --  ft = { "plantuml", "puml" },
+  --},
+  --{
+  --  'open-browser.vim',
+
+  --  enabled = true,
+  --  auto_enable = true,
+  --  lazy = true,
+
+  --  ft = { "plantuml", "puml" },
+  --  dep_of = { "plantuml-previewer-vim" }
+  --},
+  {
+    "plantuml-syntax",
+
+    enabled = true,
+    auto_enable = true,
+    lazy = true,
+
+    ft = { "plantuml", "puml" },
+    dep_of = { "plantuml-previewer-vim" }
+  },
+
   {
     "nvim-web-devicons",
 

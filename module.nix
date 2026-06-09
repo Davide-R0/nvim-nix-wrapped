@@ -189,6 +189,12 @@ inputs:
 
       resvg # rendering svg
 
+      # PlantUML
+      plantuml-c4
+      #jre
+      graphviz
+      imv
+
       # ====================
       # LSP
       # ====================
@@ -336,6 +342,12 @@ inputs:
       fzf-vim
 
       conform-nvim # text formatter
+
+      # PlantUML
+      #plantuml-nvim
+      plantuml-syntax
+      #plantuml-previewer-vim
+      #open-browser-vim
 
       # Typst preview
       typst-preview-nvim

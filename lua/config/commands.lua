@@ -18,6 +18,15 @@ vim.filetype.add({
   }
 })
 
+vim.filetype.add({
+  extension = {
+    puml = 'plantuml',
+    pu = 'plantuml',
+    uml = 'plantuml',
+    plantuml = 'plantuml',
+  },
+})
+
 -- PRINT
 vim.api.nvim_create_user_command(
   'Pprint',
@@ -324,3 +333,120 @@ local function compile_markdown_to_pdf()
 end
 
 vim.api.nvim_create_user_command("MdToPdf", compile_markdown_to_pdf, { desc = "Compile MD to PDF via Pandoc" })
+
+--------------
+-- PlantUML --
+--------------
+-- Gruppo globale per isolare gli eventi di compilazione PlantUML
+local puml_group = vim.api.nvim_create_augroup("PlantUMLCompiler", { clear = true })
+
+-- Funzione di supporto parametrica con pipeline UNIX per Scrittura Atomica
+local function compile_plantuml(filepath, ext)
+  local image_file = vim.fn.expand("%:p:r") .. "." .. ext
+  local tmp_file = image_file .. ".tmp"
+
+  -- Escape rigoroso dei percorsi per gestire spazi o caratteri speciali nel filesystem
+  local safe_in = vim.fn.shellescape(filepath)
+  local safe_tmp = vim.fn.shellescape(tmp_file)
+  local safe_out = vim.fn.shellescape(image_file)
+
+  -- Generazione della pipeline condizionale (compilazione su tmp -> rename atomico)
+  local cmd = string.format("plantuml -pipe -t%s < %s > %s && mv %s %s", ext, safe_in, safe_tmp, safe_tmp, safe_out)
+
+  vim.fn.jobstart({ "sh", "-c", cmd }, {
+    on_exit = function(_, exit_code, _)
+      if exit_code == 0 then
+        vim.notify(string.format("PlantUML: Compilazione %s atomica completata.", ext:upper()), vim.log.levels.INFO)
+      else
+        vim.notify(string.format("PlantUML: Errore critico di compilazione %s.", ext:upper()), vim.log.levels.ERROR)
+      end
+    end,
+  })
+end
+
+-- Funzione core di astrazione per il Bootstrap della preview
+local function bootstrap_preview(ext, imv_flags)
+  local current_buf = vim.api.nvim_get_current_buf()
+  local filepath = vim.fn.expand("%:p")
+  local image_file = vim.fn.expand("%:p:r") .. "." .. ext
+
+  -- Controllo dello stato del buffer per impedire istanze di monitoraggio sovrapposte
+  if vim.b[current_buf].plantuml_preview_active then
+    vim.notify("PlantUML: Una sessione di preview è già attiva per questo buffer.", vim.log.levels.WARN)
+    return
+  end
+
+  vim.notify(string.format("PlantUML: Inizializzazione motore di rendering %s...", ext:upper()), vim.log.levels.INFO)
+
+  -- Compilazione iniziale sincrona rispetto all'apertura del visualizzatore
+  vim.fn.jobstart({ "plantuml", "-t" .. ext, filepath }, {
+    on_exit = function(_, exit_code, _)
+      if exit_code == 0 then
+        -- Costruzione dinamica del comando di invocazione per imv
+        local imv_cmd = { "imv" }
+        for _, flag in ipairs(imv_flags) do
+          table.insert(imv_cmd, flag)
+        end
+        table.insert(imv_cmd, image_file)
+
+        -- Esecuzione del visualizzatore in un processo distaccato (detached)
+        vim.fn.jobstart(imv_cmd, { detach = true })
+
+        -- Registrazione dell'autocommand buffer-local vincolato al formato scelto
+        vim.api.nvim_create_autocmd("BufWritePost", {
+          group = puml_group,
+          buffer = current_buf,
+          callback = function()
+            compile_plantuml(filepath, ext)
+          end,
+        })
+
+        -- Mutazione dello stato del buffer
+        vim.b[current_buf].plantuml_preview_active = true
+        vim.notify(string.format("PlantUML: Preview %s instradata. Configurazione salvataggio armata.", ext:upper()),
+          vim.log.levels.INFO)
+      else
+        vim.notify("PlantUML: Fallimento durante il bootstrap. Verificare la sintassi del codice.", vim.log.levels.ERROR)
+      end
+    end
+  })
+end
+
+-- Funzione core per la rimozione dei listener e abbattimento dei processi
+local function stop_preview()
+  local current_buf = vim.api.nvim_get_current_buf()
+
+  if not vim.b[current_buf].plantuml_preview_active then
+    vim.notify("PlantUML: Nessuna sessione di preview attiva su questo buffer.", vim.log.levels.WARN)
+    return
+  end
+
+  -- 1. Tabula rasa degli autocomandi associati unicamente a questo buffer
+  vim.api.nvim_clear_autocmds({ group = puml_group, buffer = current_buf })
+
+  -- 2. Intercettazione e terminazione del processo imv associato
+  local job_id = vim.b[current_buf].plantuml_imv_job_id
+  if job_id and job_id > 0 then
+    vim.fn.jobstop(job_id)
+  end
+
+  -- 3. Reset dello stato del buffer
+  vim.b[current_buf].plantuml_preview_active = false
+  vim.b[current_buf].plantuml_imv_job_id = nil
+
+  vim.notify("PlantUML: Sessione di preview interrotta. Autocompilazione disarmata.", vim.log.levels.INFO)
+end
+
+-- Registrazione delle entrypoint CLI in Neovim
+vim.api.nvim_create_user_command("PumlImv", function()
+  -- Formato raster PNG, imv avviato con configurazione di background nativa
+  bootstrap_preview("png", {})
+end, { desc = "Compila in PNG, avvia imv e attiva l'autocompilazione al salvataggio" })
+
+vim.api.nvim_create_user_command("PumlImvSvg", function()
+  -- Formato vettoriale SVG, imv avviato forzando lo sfondo bianco esadecimale
+  bootstrap_preview("svg", { "-b", "ffffff" })
+end, { desc = "Compila in SVG, avvia imv con sfondo bianco e attiva l'autocompilazione al salvataggio" })
+
+vim.api.nvim_create_user_command("PumlImvStop", stop_preview,
+  { desc = "Sgancia i listener di salvataggio e chiude l'istanza imv associata" })

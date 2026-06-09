@@ -1,0 +1,133 @@
+@startuml
+skinparam actorStyle awesome
+skinparam defaultTextAlignment center
+skinparam maxMessageSize 150
+skinparam linetype ortho
+skinparam shadowmap false
+skinparam componentStyle rectangle
+' --- RISOLUZIONE OVERLAP E GESTIONE SPAZI ---
+skinparam padding 10
+skinparam nodesep 70
+skinparam ranksep 80
+skinparam NodePadding 20
+skinparam RectanglePadding 20
+' Ottimizzazione dei colori per l'isolamento di sicurezza
+skinparam node {
+    BackgroundColor<<MicroVM>> #FFF0F0
+    BorderColor<<MicroVM>> #FF0000
+}
+
+' Definizione della Nota Architetturale
+note as NoteLivelli
+  **Livello 1 (Dominio Simmetrico di Quorum):**
+  Raggruppa i processi core che devono tassativamente esistere in forma matematicamente
+  identica e parallela su tutti i nodi fisici (Host 1, 2 e 3). Questo garantisce
+  la sopravvivenza del Control Plane in caso di distruzione di un intero datacenter
+  o server fisico.
+  **Isolamento L1:** Container OCI nativi o demoni di sistema nativi.
+
+  **Livello 2 (Dominio Asimmetrico di Specializzazione):**
+  Raggruppa i processi accessori che vengono installati solo su nodi specifici, al fine di
+  evitare la contesa delle risorse (I/O disco, CPU, saturazione banda) con i processi
+  critici del database e dell'orchestrazione appartenenti al Livello 1.
+  **Isolamento L2 (Host 1 e 2):** Container OCI nativi o demoni di sistema nativi.
+  **Isolamento L2 (Host 3):** Tassativamente MicroVM hardware-accelerated.
+end note
+
+' Entità Esterne: Dominio Rete Unificato (Correzione Errore)
+cloud "Internet / Edge Public WAN" as public_network {
+    collections "BYOD Customer Nodes\n[1..*]" as byod #Application
+    actor "Utenti Web Pubblici" as public_users
+}
+
+rectangle "Control Plane - Management Infrastructure (Quorum Distribuito)" {
+
+    ' ================= HOST 1 =================
+    node "Host 1: Nodo Computazionale (Fabbrica)" as host1 {
+        rectangle "Livello 1: Shared Core" as h1_l1 {
+            component "HAProxy / Keepalived\n(Virtual IP)" as h1_lb
+            component "Temporal Microservices\n(Frontend/History/Matching)" as h1_temp
+            database "PostgreSQL + Patroni\n(Leader/Replica)" as h1_pg
+        }
+        rectangle "Livello 2: Asymmetric Workloads" as h1_l2 {
+            component "Nix Build Daemon" as nix
+            component "Worker CI/CD" as worker
+            component "Attic Cache Server" as attic
+            component "Colmena" as colmena
+        }
+        ' Vettore Nascosto per forzare l'allineamento verticale e prevenire overlap
+        h1_l1 -[hidden]down-> h1_l2
+    }
+
+    ' ================= HOST 2 =================
+    node "Host 2: Nodo di Rete & AI Proxy (Router)" as host2 {
+        rectangle "Livello 1: Shared Core" as h2_l1 {
+            component "HAProxy / Keepalived\n(Virtual IP)" as h2_lb
+            component "Temporal Microservices\n(Frontend/History/Matching)" as h2_temp
+            database "PostgreSQL + Patroni\n(Leader/Replica)" as h2_pg
+        }
+        rectangle "Livello 2: Asymmetric Workloads" as h2_l2 {
+            component "Headscale\n(Control Plane VPN)" as headscale #LightBlue
+            component "LiteLLM\n(AI Proxy)" as litellm
+        }
+        ' Vettore Nascosto per forzare l'allineamento verticale e prevenire overlap
+        h2_l1 -[hidden]down-> h2_l2
+    }
+
+    ' ================= HOST 3 =================
+    node "Host 3: Nodo di Business Logic (Front-Office)" as host3 {
+        rectangle "Livello 1: Shared Core" as h3_l1 {
+            component "HAProxy / Keepalived\n(Virtual IP)" as h3_lb
+            component "Temporal Microservices\n(Frontend/History/Matching)" as h3_temp
+            database "PostgreSQL + Patroni\n(Leader/Replica)" as h3_pg
+        }
+        rectangle "Livello 2: Asymmetric Workloads (Isolamento Hardened)" as h3_l2 {
+            node "MicroVM A" <<MicroVM>> as mvm_a {
+                component "Sito Web\nDashboard personale" as web
+            }
+            node "MicroVM B" <<MicroVM>> as mvm_b {
+                component "CRM Gestionale" as crm
+            }
+            node "MicroVM C" <<MicroVM>> as mvm_c {
+                component "Fossil (VCS)" as fossil
+            }
+        }
+        ' Vettore Nascosto per forzare l'allineamento verticale e prevenire overlap
+        h3_l1 -[hidden]down-> h3_l2
+    }
+}
+
+' --- REPLICA E QUORUM DATA LAYER (Livello 1) ---
+h1_pg <..> h2_pg : Raft / Patroni Sync
+h2_pg <..> h3_pg : Raft / Patroni Sync
+h3_pg <..> h1_pg : Raft / Patroni Sync
+
+' --- COMUNICAZIONE INTERNA STATICA ---
+h1_lb --> h1_temp : gRPC Inbound
+h2_lb --> h2_temp : gRPC Inbound
+h3_lb --> h3_temp : gRPC Inbound
+
+h1_temp --> h1_pg : Read/Write
+h2_temp --> h2_pg : Read/Write
+h3_temp --> h3_pg : Read/Write
+
+' Connessioni specifiche del workflow computazionale su Host 1
+attic --> worker
+colmena --> worker
+worker --> h1_temp : Local Orchestration
+
+' --- FLUSSI DI RETE PUBBLICA (INGRESS) ---
+public_users ==> web : HTTPS Inbound (TCP 443)\n[Vettore di Minaccia Primario]
+
+' --- FLUSSO OPERATIVO COMPLETO (Sequenza Temporale) ---
+byod ==> headscale : [1] Instaurazione Tunnel WireGuard
+byod --> h1_lb : [2] Richiesta Interfaccia VIP (Failover Line)
+byod --> h2_lb : [2] Richiesta Interfaccia VIP (Failover Line)
+byod --> h3_lb : [2] Richiesta Interfaccia VIP (Failover Line)
+
+note top of headscale
+  Il tunnel VPN espone l'instradamento
+  verso la sottorete logica del Load Balancer
+end note
+
+@enduml

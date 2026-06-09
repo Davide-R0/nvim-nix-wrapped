@@ -99,3 +99,6 @@ vim.scrolloff = 3
 vim.g['loaded_perl_provider'] = 0
 --Deactivate ruby provider
 vim.g['loaded_ruby_provider'] = 0
+
+
+--vim.env.BROWSER = 'brave'

@@ -1,0 +1,88 @@
+@startuml
+hide circle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+' Definizione dei tipi Enum
+enum LogLevel {
+    INFO
+    WARNING
+    ERROR
+    DEBUG
+}
+
+enum TriggerType {
+    MANUAL
+    SCHEDULED
+    WEBHOOK
+}
+
+enum StatusWorkflowRun {
+    RUNNING
+    PAUSED
+    SLEEPING
+    DONE
+    FAILED
+    CANCELLED
+    TIMED_OUT
+}
+
+enum TriggerStatus {
+    ACTIVE
+    INACTIVE
+    ERROR_BACKOFF
+}
+
+' Entità Database
+entity "workflows" as workflows {
+    *id : String <<PK>>
+    --
+    *name : String
+    description : Text
+    tenant_id : String
+    *is_active : Boolean
+    *created_at : DateTime
+}
+
+entity "workflow_triggers" as workflow_triggers {
+    *id : String <<PK>>
+    --
+    *workflow_id : String <<FK>>
+    *trigger_type : TriggerType
+    *status : TriggerStatus
+    cron_expr : String
+    start_at : DateTime
+}
+
+entity "workflow_runs" as workflow_runs {
+    *id : String <<PK>>
+    --
+    *workflow_id : String <<FK>>
+    *temporal_run_id : String <<UNIQUE>>
+    *status : StatusWorkflowRun
+    input_payload : JSON
+    error_message : Text
+    *started_at : DateTime
+    completed_at : DateTime
+}
+
+entity "workflow_logs" as workflow_logs {
+    *id : Integer <<PK>> <<AUTOINCREMENT>>
+    --
+    *run_id : String <<FK>>
+    *message : Text
+    *level : LogLevel
+    *timestamp : DateTime
+}
+
+' Relazioni (Uno-a-Molti)
+workflows ||--o{ workflow_triggers : "1:N"
+workflows ||--o{ workflow_runs : "1:N"
+workflow_runs ||--o{ workflow_logs : "1:N"
+
+@enduml
