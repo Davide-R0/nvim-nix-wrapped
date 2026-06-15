@@ -37,7 +37,7 @@ return {
         ["core.dirman"] = {
           config = {
             workspaces = {
-              personale = "~/Norg",
+              personale = "~/04_Projects/Norg",
             },
             index = "index.norg",
             default_workspace = "personale",

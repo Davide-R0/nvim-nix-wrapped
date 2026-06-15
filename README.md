@@ -6,6 +6,11 @@ input by a NixOS system, but can also be tested and built locally.
 
 ---
 
+anche se non c'è a config di nvim in config, creare la directory per gli script
+di theming: `mkdir ~/.system/config/nvim` e lasciarla vuota
+
+---
+
 $\hbar\ \frac{1}{2}$
 
 # Per testare in dev
