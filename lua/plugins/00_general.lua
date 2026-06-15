@@ -275,6 +275,7 @@ return {
         error   = { "DiagnosticError", "ErrorMsg", "#DC2626" },  -- Rosso
         warning = { "DiagnosticWarn", "WarningMsg", "#FBBF24" }, -- Giallo
         info    = { "DiagnosticInfo", "#2563EB" },               -- Blu
+        todo    = { "DiagnosticInfo", "#2563EB" },               -- Blu
         hint    = { "DiagnosticHint", "#10B981" },               -- Verde
         default = { "Identifier", "#7C3AED" },                   -- Viola
         my_todo = { "#FF00FF" }                                  -- Fucsia (Esempio personalizzato!)
