@@ -3,10 +3,12 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+
     wrappers = {
       url = "github:BirdeeHub/nix-wrapper-modules";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -16,6 +18,7 @@
       url = "github:BirdeeHub/lze";
       flake = false;
     };
+
     plugins-lzextras = {
       url = "github:BirdeeHub/lzextras";
       flake = false;
