@@ -314,39 +314,11 @@ inputs:
       };
     };
 
-    # This submodule modifies both levels of your specs
-    # NOTE: non ho capisto cosa sia questa opzione? a che serve?
-    specMods =
-      {
-        # When this module is ran in an inner list,
-        # this will contain `config` of the parent spec
-        parentSpec ? null,
-        # and this will contain `options`
-        # otherwise they will be `null`
-        parentOpts ? null,
-        parentName ? null,
-        # and then config from this one, as normal
-        config,
-        # and the other module arguments.
-        ...
-      }:
-      {
-        # you could use this to change defaults for the specs
-        # config.collateGrammars = lib.mkDefault (parentSpec.collateGrammars or false);
-        # config.autoconfig = lib.mkDefault (parentSpec.autoconfig or false);
-        # config.runtimeDeps = lib.mkDefault (parentSpec.runtimeDeps or false);
-        # config.pluginDeps = lib.mkDefault (parentSpec.pluginDeps or false);
-        # or something more interesting like:
-        # add a runtimePkgs field to the specs themselves
-        options.runtimePkgs = options.runtimePkgs // {
-          description = ''
-            A runtimePkgs spec field to put packages on the PATH
-            If the spec is disabled, this value will not be included in the resulting neovim derivation
-          '';
-        };
-        # You could do this too
-        # config.before = lib.mkDefault [ "INIT_MAIN" ];
+    specMods = _: {
+      options.runtimePkgs = options.runtimePkgs // {
+        description = "A runtimePkgs spec field to put packages on the PATH";
       };
+    };
 
     runtimePkgs = config.specCollect (acc: v: acc ++ (v.runtimePkgs or [ ])) [ ];
   };

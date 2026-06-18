@@ -46,8 +46,11 @@ return {
         severity_sort = true,
       })
 
-      vim.lsp.config('*', {
-        on_attach = function(client, bufnr)
+      vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('my-lsp-attach-group', { clear = true }),
+        callback = function(event)
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          local bufnr = event.buf
           -- Funzione helper per definire scorciatoie
           local nmap = function(keys, func, desc)
             if desc then
