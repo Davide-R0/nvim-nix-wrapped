@@ -4,6 +4,9 @@ local set = vim.opt
 vim.g.mapleader = '\\'
 vim.g.maplocalleader = '\\'
 
+-- Enable executions of local `.nvim.lua`
+vim.o.exrc = true
+
 -- per norg
 set.conceallevel = 2
 
