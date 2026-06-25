@@ -126,7 +126,7 @@ inputs:
         after = [ "lze" ];
         runtimePkgs = with pkgs; [
           # TODO: quali di questi non sono strettamente necessari o andrebbero isntalalrti dall host che lo usa?
-
+          mermaid-cli
           tree-sitter
           prettier # code formatter (for conform-nvim)
           # manual for nix options
@@ -248,6 +248,8 @@ inputs:
             # You can override defaults from the parent spec here
             lazy = false;
           }
+
+          #diagram-nvim # NOTE: non ha una licenza!!
           # for dms automatic color creation
           base16-nvim
           # General

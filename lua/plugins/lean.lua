@@ -13,6 +13,10 @@ return {
   end,
 
   opts = {
+    -- DISATTIVA I POPUP DI RICARICAMENTO IMPORTS!!!
+    on_imports_out_of_date = function(_)
+      -- Se si vuole ricaricamento automatico: require('lean.lsp').restart_file(bufnr)
+    end,
     mappings = true,
     ft = {
       nomodifiable = {}
