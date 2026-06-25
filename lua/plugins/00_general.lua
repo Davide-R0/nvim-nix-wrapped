@@ -19,6 +19,23 @@ return {
   --  dep_of = { "plantuml-previewer-vim" }
   --},
   {
+    "nvim-surround",
+
+    enabled = true,
+    auto_enable = false,
+    lazy = true,
+
+    version = "^4.0.0", -- Use for stability; omit to use `main` branch for the latest features
+    event = "DeferredUIEnter",
+    --event = "VeryLazy",
+    --lazy = true, -- ??
+
+    -- Optional: See `:h nvim-surround.configuration` and `:h nvim-surround.setup` for details
+    after = function()
+      require("nvim-surround").setup({})
+    end
+  },
+  {
     "plantuml-syntax",
 
     enabled = true,
@@ -43,14 +60,14 @@ return {
 
     enabled = true,
     auto_enable = false,
+    lazy = true,
 
     ft = 'typst',
     version = '1.*',
 
     after = function(plugin)
-      require("typst-preview").setup(plugin.opts)
+      require("typst-preview").setup({})
     end,
-    opts = {},
   },
   {
     "calendar.vim",

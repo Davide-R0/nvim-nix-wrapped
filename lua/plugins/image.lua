@@ -21,7 +21,7 @@ return {
   end,
 
   opts = {
-    backend = "ueberzug",
+    backend = nixInfo("kitty", "settings", "render-backend"),
     processor = "magick_cli",
     integrations = {
       markdown = {
