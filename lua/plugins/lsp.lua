@@ -70,7 +70,7 @@ return {
           nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
           nmap('<leader>e', vim.diagnostic.open_float, 'Show diagnostic [E]rror')
           nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-          nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+          -- <leader>ca è definito da actions-preview.nvim (00_general.lua), con anteprima
           nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
           nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
 

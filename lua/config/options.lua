@@ -1,8 +1,11 @@
 -- Per le funzioni set...=... in .vim
 local set = vim.opt
 
-vim.g.mapleader = '\\'
+vim.g.mapleader = ' '
+-- localleader resta `\`: lo usano i plugin per filetype (es. vimtex `\ll`)
 vim.g.maplocalleader = '\\'
+-- Spazio da solo non deve spostare il cursore (in normal mode è come `l`)
+vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
 -- Enable executions of local `.nvim.lua`
 vim.o.exrc = true
