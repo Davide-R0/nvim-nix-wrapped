@@ -10,19 +10,22 @@ vim.o.exrc = true
 -- per norg
 set.conceallevel = 2
 
----- Attiva il controllo ortografico
---vim.opt.spell = true
----- Imposta le lingue (Italiano come principale, Inglese come secondario)
----- Neovim cercherà di capire quale usare o le userà entrambe
---vim.opt.spelllang = { 'it', 'en' }
----- Dove salvare le parole che aggiungi (con 'zg')
----- La cartella deve esistere!
---local spell_dir = vim.fn.stdpath("config") .. "/spell"
---if vim.fn.isdirectory(spell_dir) == 0 then
---  vim.fn.mkdir(spell_dir, "p")
---end
----- Definisce il file del dizionario personale
---vim.opt.spellfile = spell_dir .. "/it.utf-8.add"
+-- Controllo ortografico: una parola è giusta se è in almeno uno dei due dizionari.
+-- La grammatica inglese la controlla harper_ls (vedi plugins/lsp.lua)
+set.spelllang = { 'it', 'en' }
+-- Le parole aggiunte con `zg` vanno in stdpath("data"), la config può essere read-only
+local spell_dir = vim.fn.stdpath("data") .. "/spell"
+if vim.fn.isdirectory(spell_dir) == 0 then
+  vim.fn.mkdir(spell_dir, "p")
+end
+set.spellfile = spell_dir .. "/it.utf-8.add"
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "typst", "markdown", "tex", "gitcommit", "text" },
+  callback = function()
+    vim.opt_local.spell = true
+  end,
+})
+vim.keymap.set("n", "<leader>ts", "<cmd>setlocal spell!<cr>", { desc = "[T]oggle [S]pell" })
 --vim.keymap.set("n", "z=", function()
 --  require("telescope.builtin").spell_suggest(require("telescope.themes").get_cursor({
 --    previewer = false,

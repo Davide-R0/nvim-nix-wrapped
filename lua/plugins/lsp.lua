@@ -236,6 +236,25 @@ return {
   },
 
   {
+    -- Grammatica inglese: con isolateEnglish ignora le frasi non inglesi (l'italiano
+    -- lo copre lo spell nativo, vedi options.lua). SpellCheck è spento per non
+    -- duplicare gli errori di ortografia già segnalati da spell.
+    "harper_ls",
+    ft = { "typst", "markdown", "tex", "gitcommit", "text" },
+    lsp = {
+      filetypes = { "typst", "markdown", "tex", "gitcommit", "text" },
+      settings = {
+        ["harper-ls"] = {
+          isolateEnglish = true,
+          linters = {
+            SpellCheck = false,
+          },
+        },
+      },
+    }
+  },
+
+  {
     "markdown_oxide",
     ft = { "markdown" },
     lsp = {}

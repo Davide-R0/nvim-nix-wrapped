@@ -277,9 +277,25 @@ inputs:
           # Typst preview
           typst-preview-nvim
           calendar-vim
-          # Speller
-          #vim-spell-it  # manual
-          #vim-spell-en
+          # Speller: dizionario italiano per lo spell nativo (il repo vim non lo ospita)
+          {
+            data = pkgs.runCommand "vim-spell-it" { } ''
+              mkdir -p $out/spell
+              cp ${
+                pkgs.fetchurl {
+                  url = "https://ftp.nluug.nl/pub/vim/runtime/spell/it.utf-8.spl";
+                  hash = "sha256-2AczkD6DbVN5DAq4wcLyn2Y8oqd67ns4Guprh2KudBM=";
+                }
+              } $out/spell/it.utf-8.spl
+              cp ${
+                pkgs.fetchurl {
+                  url = "https://ftp.nluug.nl/pub/vim/runtime/spell/it.utf-8.sug";
+                  hash = "sha256-4LsXYaeScJJrdaj69PTQ2EDVWis0UY/Y5RKSfCckzko=";
+                }
+              } $out/spell/it.utf-8.sug
+            '';
+            lazy = false;
+          }
           # Linter
           nvim-lint
           # Git

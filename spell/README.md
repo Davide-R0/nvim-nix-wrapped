@@ -1,7 +1,9 @@
-```bash
-curl -L -o it.utf-8.spl https://raw.githubusercontent.com/vim/vim/master/runtime/spell/it.utf-8.spl
-curl -L -o it.utf-8.sug https://raw.githubusercontent.com/vim/vim/master/runtime/spell/it.utf-8.sug
+Il dizionario italiano viene scaricato da Nix (vedi `vim-spell-it` in `module.nix`),
+perché il repo GitHub di vim non ospita i file `.spl`/`.sug` (danno 404).
 
-curl -L -o en.utf-8.spl https://raw.githubusercontent.com/vim/vim/master/runtime/spell/en.utf-8.spl
-curl -L -o en.utf-8.sug https://raw.githubusercontent.com/vim/vim/master/runtime/spell/en.utf-8.sug
+Per riscaricare quello inglese:
+
+```bash
+curl -L -o en.utf-8.spl https://ftp.nluug.nl/pub/vim/runtime/spell/en.utf-8.spl
+curl -L -o en.utf-8.sug https://ftp.nluug.nl/pub/vim/runtime/spell/en.utf-8.sug
 ```
