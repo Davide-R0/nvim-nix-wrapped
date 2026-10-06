@@ -224,6 +224,12 @@ return {
       settings = {
         exportPdf = "onSave",
         formatterMode = "typstyle",
+        formatterPrintWidth = 80,
+        formatterProseWrap = true,
+        lint = {
+          enabled = true,
+          when = "onSave",
+        },
         exportHtml = "never",
       }
     }

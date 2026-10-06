@@ -191,6 +191,7 @@ inputs:
           # For typst
           typst
           tinymist # typst lsp
+          typstyle
           # Lean # NOTE: After the first installation: `elan default stable`
           elan
           # For images, pdf, videos, ecc...

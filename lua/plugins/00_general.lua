@@ -104,10 +104,15 @@ return {
       return {
         formatters_by_ft = {
           markdown = { "prettier", "markdownlint-cli2" },
+          typst = { "typstyle" },
         },
         formatters = {
           prettier = {
             prepend_args = { "--print-width", tostring(md_line_length), "--prose-wrap", "always" },
+          },
+          typstyle = {
+            -- di default typstyle non tocca il testo: --wrap-text manda a capo la prosa
+            prepend_args = { "--line-width", tostring(md_line_length), "--wrap-text" },
           },
         },
         format_on_save = {

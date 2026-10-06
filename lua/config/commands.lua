@@ -258,6 +258,15 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+-- Typst: a capo automatico a 80 colonne mentre scrivi (e gq per riformattare)
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "typst",
+  callback = function()
+    vim.opt_local.textwidth = 80
+    vim.opt_local.formatoptions:append("t")
+  end,
+})
+
 local function insert_md_yaml()
   if vim.bo.filetype ~= "markdown" then
     vim.notify("This is not a md file!", vim.log.levels.WARN)
