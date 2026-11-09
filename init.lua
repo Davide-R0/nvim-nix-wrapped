@@ -15,6 +15,9 @@ do
   end
 end
 
+-- In modalità vault (vim.g.vault) gli handler spengono LSP e AI, vedi config/vault.lua
+local vault = require("config.vault")
+
 nixInfo.lze.register_handlers {
   {
     spec_field = "auto_enable",
@@ -41,7 +44,7 @@ nixInfo.lze.register_handlers {
       return plugin
     end,
   },
-  {
+  vault.guard_handler({
     spec_field = "for_cat",
     set_lazy = false,
     modify = function(plugin)
@@ -52,8 +55,8 @@ nixInfo.lze.register_handlers {
       end
       return plugin
     end,
-  },
-  nixInfo.lze.lsp,
+  }, function(plugin) return plugin.for_cat == "ai" end),
+  vault.guard_handler(nixInfo.lze.lsp),
 }
 
 nixInfo.lze.h.lsp.set_ft_fallback(function(name)
@@ -67,6 +70,7 @@ nixInfo.lze.h.lsp.set_ft_fallback(function(name)
 end)
 
 require("config.options")
+vault.setup()
 require("config.keymaps")
 require("config.commands")
 

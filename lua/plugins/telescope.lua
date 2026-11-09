@@ -51,8 +51,15 @@ return {
       local telescope = require('telescope')
       local actions = require('telescope.actions')
 
+      -- In modalità vault non salviamo su disco i prompt cercati (nil = default telescope)
+      local history = nil
+      if require('config.vault').enabled then
+        history = false
+      end
+
       telescope.setup {
         defaults = {
+          history = history,
           mappings = {
             i = {
               ['<C-y>'] = actions.select_default,

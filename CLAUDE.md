@@ -52,6 +52,7 @@ lua/config/
   commands.lua               # user command (:Pprint, :MdToPdf, :Puml*, ...), autocmd FileType
   ocp_preview.lua            # preview build123d/OCP (setup() chiamato da commands.lua)
   transparency.lua           # sfondo trasparente
+  vault.lua                  # modalità vault (g:vault): niente undo/swap/shada/clipboard, LSP e AI spenti
 lua/plugins/
   00_general.lua             # ~30 plugin "utility" in un unico file (surround, spectre, git, ...)
   <plugin>.lua               # una spec (o lista di spec) per file
@@ -152,3 +153,8 @@ Formatter/linter Nix disponibili sul PATH del wrapper: `nixfmt`,
   `after`, rinomina pacchetto).
 - `clipboard = unnamedplus`: il registro unnamed è sincronizzato
   con `+`.
+- **Modalità vault**: `nvim --cmd 'let g:vault = 1'` (alias
+  `vvim`). `config/vault.lua` spegne undofile, swap, backup,
+  writebackup, shada, clipboard e la history di telescope; gli
+  handler `for_cat` (solo `ai`) e `lsp` in `init.lua` sono avvolti
+  da `vault.guard_handler`, che disabilita quelle spec.
